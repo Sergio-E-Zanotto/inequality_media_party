@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Political sentences: where does a new statement begin?</title>
+<style>
+:root { --bg:#f5f6f8; --card:#fff; --ink:#1d2330; --muted:#667085; --line:#d0d5dd; --accent:#2f5bd3;
+        --accent-soft:#e8eefc; --hl:#fff0a0; --ctx:#8a94a6; --cut:#d92d20; --how:#f2f4f7; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+header { background:#1f2a44; color:#fff; padding:10px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+header .t { font-weight:600; }
+header .p { margin-left:auto; font-size:13px; opacity:.85; }
+.bar { height:4px; background:#e4e7ec; } .bar > div { height:4px; background:var(--accent); width:0; transition:width .2s; }
+main { max-width:900px; margin:0 auto; padding:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; }
+h2 { font-size:17px; margin:0 0 8px; } h3 { font-size:16px; margin:0 0 6px; }
+.part { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:8px; }
+.text { font-size:16px; line-height:1.65; }
+.text.long { max-height:60vh; overflow:auto; padding-right:6px; }
+.text p { margin:0 0 .8em; } .text p:last-child { margin-bottom:0; }
+.ttl { font-weight:700; }
+.ctx { color:var(--ctx); }
+.qs { background:var(--hl); font-weight:600; padding:1px 3px; border-radius:3px; }
+.how { font-size:13px; color:#475467; background:var(--how); border-radius:8px; padding:8px 10px; margin:0 0 10px; white-space:pre-line; }
+.opts { display:flex; flex-wrap:wrap; gap:8px; }
+.opt { border:1px solid var(--line); border-radius:8px; padding:8px 14px; background:#fff; font:inherit; cursor:pointer; text-align:left; }
+.opt:hover { border-color:var(--accent); }
+.opt.on { border-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+.opt small { display:block; font-weight:400; color:var(--muted); font-size:12px; max-width:250px; }
+.stop { font-size:13px; color:var(--muted); font-style:italic; }
+.nav { display:flex; gap:8px; justify-content:space-between; align-items:center; margin-bottom:14px; }
+button { font:inherit; border-radius:8px; border:1px solid var(--line); background:#fff; padding:8px 16px; cursor:pointer; }
+button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+.id { font-size:12px; color:var(--muted); }
+.sent { padding:8px 0; border-top:1px solid #eaecf0; line-height:2; }
+.sent:first-of-type { border-top:0; }
+.sent { user-select:none; -webkit-user-select:none; }
+.w { padding:2px 0; }
+.seg1 { background:#e8f0fe; } .seg2 { background:#fdf0e6; }
+.gap { display:inline-block; width:10px; height:1.6em; vertical-align:middle; cursor:pointer; position:relative; }
+.gap::after { content:''; position:absolute; left:4px; top:2px; bottom:2px; width:0; border-left:2px dotted transparent; }
+.sent:hover .gap::after { border-left-color:#c8ced8; }
+.sent .gap:hover::after { border-left:2px solid var(--cut); }
+.sent .gap.cut { background:none; width:14px; }
+.sent .gap.cut::after { border-left:3px solid var(--cut); left:5px; }
+.cnt { font-size:12px; color:var(--cut); margin-left:6px; }
+.note { width:100%; min-height:40px; font:inherit; font-size:13px; border:1px dashed var(--line); border-radius:8px; padding:6px 8px; background:transparent; }
+.task { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px solid #eaecf0; flex-wrap:wrap; }
+.tname { font-weight:600; } .tright { display:flex; gap:10px; align-items:center; }
+input[type=text] { font:inherit; padding:7px 10px; border:1px solid var(--line); border-radius:8px; width:200px; }
+.msg { color:var(--cut); font-size:13px; margin-left:8px; }
+
+/* ---- 2026-10-14 patch: splitting gate, wider targets, platform screens ---- */
+.sent { touch-action:manipulation; }
+.gap { width:14px; }
+.sent .gap.cut { width:18px; }
+.sent.todo { background:#fffbea; }
+.nos { font-size:12px; margin-left:10px; padding:2px 10px; border:1px solid var(--line);
+       border-radius:999px; background:#fff; font:inherit; font-size:12px; cursor:pointer;
+       vertical-align:middle; }
+.nos:hover { border-color:var(--accent); }
+.nos.on { border-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+.hint { font-size:13px; color:#475467; margin:0 0 10px; }
+.ctxnone { font-size:13px; color:var(--ctx); font-style:italic; }
+.code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:20px; letter-spacing:2px;
+        background:var(--how); border:1px solid var(--line); border-radius:6px; padding:4px 12px; }
+a.btn { display:inline-block; font:inherit; text-decoration:none; border-radius:8px;
+        border:1px solid var(--line); background:#fff; padding:8px 16px; cursor:pointer; color:var(--ink); }
+a.btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.warn { color:var(--cut); }
+
+.dump { width:100%; min-height:260px; font-family:ui-monospace,Menlo,Consolas,monospace;
+        font-size:12px; border:1px solid var(--line); border-radius:8px; padding:8px;
+        white-space:pre; overflow:auto; }
+
+.alarm { background:#fde7e5; border:2px solid var(--cut); border-radius:10px; padding:12px 14px;
+         margin-bottom:14px; font-size:14px; line-height:1.45; color:#7a140c; }
+.alarm strong { color:var(--cut); }
+
+.gold { border-color:#2f5bd3; background:#f4f7ff; }
+.gold .ans { font-weight:600; margin:4px 0; }
+ol { padding-left:20px; } li { margin:4px 0; }
+
+/* guidelines card (embedded TRAINING_*.html), overlay and header button */
+.guide h1 { font-size:1.35em; margin:0 0 8px; } .guide h2 { font-size:1.1em; margin-top:26px; color:#333; border-bottom:2px solid #ddd; padding-bottom:4px; }
+.guide .gnum { margin:10px 0 6px; } .guide .gl { margin:0 0 22px; } .guide .ex { margin:8px 0 8px 18px; padding:6px 10px; border-radius:6px; }
+.guide .ex.ok { border-left:5px solid #2e7d32; background:#f3f9f3; } .guide .ex.bad { border-left:5px solid #b71c1c; background:#fbf1f1; }
+.guide .ex .part { font-weight:600; text-transform:none; letter-spacing:0; font-size:13px; } .guide .ex.bad .part { color:#b71c1c; } .guide .ex.ok .part { color:#2e7d32; }
+.guide .ans { font-weight:600; margin:6px 0 0; } .guide .lead { color:#555; }
+.overlay { position:fixed; inset:0; background:rgba(16,24,40,.55); z-index:50; overflow:auto; padding:24px 12px; }
+.overlay-box { max-width:900px; margin:0 auto; } .overlay-box .nav { position:sticky; top:0; background:var(--bg); padding:8px 0; z-index:1; }
+header .hbtn { background:#fff; color:#1f2a44; border:0; border-radius:6px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; }
+</style>
+</head>
+<body>
+<header><span class="t" id="htitle"></span><button class="hbtn" id="hguide" type="button" style="display:none">Guidelines</button><span class="p" id="hprog"></span></header>
+<div class="bar"><div id="hbar"></div></div>
+<main id="app"></main>
+<script id="data" type="application/json">{"built": "20261023101128", "mode": "crowd", "task": "T1_split", "language": "German", "lang": "de", "title": "Political sentences: where does a new statement begin? (pilot)", "intro": "You will see short paragraphs, one sentence per line, and mark where a new political statement (a quasi-sentence) begins inside a sentence. This is a short pilot run; at the end we ask for your comments.", "instr": {"q1": {"q": "Q1. Is this article about politics?", "how": "YES = politics is a main theme: government, parliament, parties, politicians acting as politicians, elections, laws and public policy (taxes, welfare, schools, migration, health), political protest. Foreign politics is also yes.\nNO = politics is absent or only mentioned in passing: sport, culture, lifestyle, celebrity and human-interest stories, business news without a policy angle, accidents or crime. A politician appearing as a private person or as a celebrity does not make an article political.\nJudge the whole article, not one sentence."}, "q3": {"q": "Q3. Where does a new quasi-sentence begin?", "how": "Every line on the screen is one sentence. Decide whether it contains one unit of meaning or several, and mark where each new unit begins.\nA quasi-sentence is one unit of meaning: one statement, demand, measure, judgement or fact. A sentence can contain one or several; a quasi-sentence never runs across two sentences. Boundaries usually fall at a semicolon, at a comma, or at “and” / “but” — but you decide where one unit ends and the next begins.\nTo mark a boundary, click the space between two words: a red line appears and the new quasi-sentence is shaded. Click the red line again to remove it. If the whole sentence is one unit of meaning, press “one quasi-sentence”."}, "q4": {"q": "Q4. Does the highlighted statement refer to equality, social justice or the equal treatment of all people?", "how": "Code the highlighted statement (one quasi-sentence) only; the grey text before and after is context.\nYES = the statement refers to economic equality, equal chances or equal rights (the three kinds in Q5), whatever its position: in favour, against, or merely reporting.\nNO = no such reference. Examples of NO: equality before the law, fair application of the rule of law, physical integrity, immigration or asylum as such, crime, as well as names, job titles and datelines."}, "q5": {"q": "Q5. Which kind of equality? Choose ONE category.", "how": "If more than one category applies, decide which ONE is most clearly emphasized.", "opts": [{"key": "econ", "name": "Economic equality", "desc": "Statements mentioning financial and economic equality. Examples: ordinary citizens are doing poorly; economic inequality is on the rise; redistribute from the top to the bottom; the rich should bear a larger burden; society is drifting apart; narrow the gap between rich and poor; wealth tax; share the benefits of globalization fairly; mobility, energy, housing and health care must be affordable for all."}, {"key": "chances", "name": "Equal chances / social mobility", "desc": "Statements mentioning equal educational, economic and social opportunities. Examples: good education for all; higher education accessible for low- and middle-income students; a child's social background should not determine its future; everyone must be given a fair chance regardless of their parents' income."}, {"key": "rights", "name": "Equal rights / anti-discrimination", "desc": "Statements mentioning discrimination based on disability, race, colour, religion, sex or gender; LGBTQ rights; equal pay for women (gender pay gap). Examples: we are the party of diversity and inclusion; we want a diverse society; a quota for women on supervisory boards."}]}, "q6": {"q": "Q6. What position does the statement take on equality?", "how": "SUPPORTS = in favour of more equality or against inequality — demands, measures that reduce inequality, criticism of inequality; saying that inequality exists, grows or is a problem also counts.\nAGAINST = argues against more equality or against the measures for it, or presents inequality as acceptable, deserved or necessary.\nMENTIONS = refers to the topic without taking a position (neutral facts, events, agendas).\nReported speech: code the position of the actor who is reported ('Labour calls for a wealth tax' = supports). The position is about equality, not about a party: 'The tax cuts only help the rich' = supports."}}, "q2": {"q": "Q2. Is it mainly about German national politics or international politics?", "how": "NATIONAL = the main political issue sits in the national arena: the federal government, the Bundestag, national parties and their leaders, national laws, elections and policy debates. A foreign event counts as national when the article is about how the German government, parliament or parties respond to it.\nINTERNATIONAL = mainly another country's politics, or international affairs with no domestic focus.\nThe main topic decides, not a single sentence."}, "training": [{"id": "G-DE_H01-3", "line_ids": ["DE_H01-3"], "sentences": [{"idx": 1, "text": "Auch darum wollen wir das Grundgesetz ändern, damit endlich Bund und Länder zusammenarbeiten dürfen und gemeinsam eine optimale Unterstützung und Förderung der Kinder und Jugendlichen ermöglichen - unabhängig vom Geldbeutel der Eltern."}], "gold": {"lines": [{"status": "split", "cuts": [14]}], "note": "Both experts agree: two units of meaning — the demand to change the Grundgesetz so that Bund and Länder may cooperate, and what this cooperation should achieve for children regardless of their parents' income. The cut is before “und gemeinsam”."}}, {"id": "G-DE_H05-2", "line_ids": ["DE_H05-2"], "sentences": [{"idx": 1, "text": "Denn die Antwort auf unsere kleine Anfrage zeigt: Alle Familiensplittingmodelle öffnen die Schere zwischen armen und reichen Familien noch weiter."}], "gold": {"lines": [{"status": "one_qs", "cuts": []}], "note": "Both experts agree: one unit of meaning. “Denn die Antwort auf unsere kleine Anfrage zeigt:” only introduces the finding; introduction and finding together are one quasi-sentence."}}], "entry": {"items": [{"id": "G-DE_H07-2-DE_H09-2", "line_ids": ["DE_H07-2", "DE_H09-2"], "sentences": [{"idx": 1, "text": "Wir investieren in Schulen, Kitas und Pflege, schaffen einen sozialen Arbeitsmarkt, stärken die dezentrale Energieversorgung und mobilisieren Milliarden für den öffentlichen Wohnungsbau oder die Schaffung eines flächendeckenden Glasfasernetzes."}, {"idx": 2, "text": "Die Bundesregierung tut viel zu wenig gegen die grassierende Ungerechtigkeit im Bildungssystem."}], "gold": {"lines": [{"status": "split", "cuts": null}, {"status": "one_qs", "cuts": []}]}}, {"id": "G-DE_H02-4-DE_H05-4", "line_ids": ["DE_H02-4", "DE_H05-4"], "sentences": [{"idx": 1, "text": "Es wird keine betriebliche Vermögensteuer geben, die Unternehmen daran hindert, ihre Eigenkapitalbasis zu stärken und zu investieren."}, {"idx": 2, "text": "Gleiche Förderung für alle Kinder und der Übergang zur Individualbesteuerung."}], "gold": {"lines": [{"status": "one_qs", "cuts": []}, {"status": "split", "cuts": [5]}]}}], "rule": {"min_status_correct": 3, "min_split_detected": 1}}, "batches": [[{"id": "DE_P01", "sentences": [{"idx": 1, "text": "Zwar haben erweiterte Antidiskriminierungsgesetze sowie das Professorinnenprogramm des Bundes und der Länder grundsätzlich zu einer Verbesserung der Karrierechancen von Frauen in der Wissenschaft beigetragen."}, {"idx": 2, "text": "Dennoch sind die Zahlen immer noch erschreckend: Obwohl über die Hälfte der Studierenden und knapp die Hälfte der Doktoranden Frauen sind, besetzen sie am Ende nur ein Fünftel der Professorenstellen."}, {"idx": 3, "text": "Dies ist eine Verschwendung von Potenzial und Talenten, die wir uns schlicht nicht leisten können."}]}, {"id": "DE_P14", "sentences": [{"idx": 1, "text": "Zur heutigen Debatte im Deutschen Bundestag für mehr Chancengleichheit von Frauen in Wissenschaft und Forschung erklärt die zuständige Berichterstatterin der SPD-Bundestagsfraktion Marianne Schieder: Die SPD-Bundestagsfraktion hat bereits vor über einem Jahr einen Antrag in den Bundestag eingebracht, um für mehr Gleichberechtigung in der Wissenschaft zu sorgen."}, {"idx": 2, "text": "Darin werden verbindliche Rahmenbedingungen gefordert, zum Beispiel die Kopplung von Forschungsgeldern an Gleichstellungsstandards oder attraktivere Arbeitsbedingungen für junge Wissenschaftlerinnen."}]}, {"id": "DE_P11", "sentences": [{"idx": 1, "text": "Denn wir wollen nicht nur den Zugang zu MINT-Berufen verbessern, sondern auch, dass mehr Frauen in Führungspositionen und in der Selbstständigkeit vertreten sind."}, {"idx": 2, "text": "Im Koalitionsvertrag sind über die bisherigen Maßnahmen hinaus weitere Schritte zur Verbesserung der Chancengleichheit von Frauen im Arbeitsleben vorgesehen: so sollen Frauen beim beruflichen Wiedereinstieg nach einer Erwerbspause unterstützt werden und leichter wieder in Vollzeit oder vollzeitnahe Arbeit wechseln können."}, {"idx": 3, "text": "Die Tarifpartner sind gefordert, die Arbeit familienfreundlicher zu gestalten und mehr innovative Arbeitszeitmodelle zuzulassen, damit Deutschland gerade für den MINT-Bereich, in dem schon heute ein Fachkräftemangel besteht, mehr qualifizierte Frauen gewinnen kann.“"}]}, {"id": "DE_P27", "sentences": [{"idx": 1, "text": "\" Nun überreichten die Interviewer ein Bildblatt, das einen gestikulierenden Mann im Schattenriss mit einer Sprechblase zeigte, in der stand: \"Was interessieren mich Zahlen und Statistiken in diesem Zusammenhang."}, {"idx": 2, "text": "Wie kann man überhaupt so kalt über ein Thema reden, bei dem es um unser aller Zukunft geht!"}, {"idx": 3, "text": "\" Die Frage dazu lautete: \"Würden Sie sagen, er hat ganz recht oder nicht recht?\" 49 Prozent der Deutschen sind der Ansicht, der Zwischenrufer habe recht, 20 Prozent sagen ausdrücklich, er habe nicht recht, 31 Prozent sind unentschieden."}]}, {"id": "DE_P26", "sentences": [{"idx": 1, "text": "Der Münchner Michael Franz analysiert seit den Siebzigerjahren Handschriften für Unternehmen, die Bewerber einschätzen wollen, oder für Privatleute, die die Echtheit eines Testaments anzweifeln."}, {"idx": 2, "text": "Er schränkt gleich ein: „Eine Unterschrift allein ist ein sehr knappes Untersuchungsmaterial, es lassen sich daraus eigentlich keine seriösen Rückschlüsse ziehen.“"}, {"idx": 3, "text": "Wenn er aber die Unterschriften von Draghi und Lagarde genauer betrachtet, kommt er doch auf einige treffende Aussagen – ohne dass er ihre Persönlichkeiten vorher genauer gekannt hätte."}, {"idx": 4, "text": "„Lagardes Unterschrift ist ein typischer Breitfeder-Wechselzug“, sagt Franz."}]}, {"id": "DE_P24", "sentences": [{"idx": 1, "text": "Armut und Ausgrenzung gehören abgeschafft."}, {"idx": 2, "text": "DIE LINKE fordert daher einen Mindestlohn ohne Ausnahmen in Höhe von 10 Euro, eine Mindestrente und sanktionsfreie Mindestsicherung von 1050 Euro, denn darunter droht Armut."}, {"idx": 3, "text": "Die Teilhabe von Kindern und Jugendlichen muss mit einer ausreichenden Kindergrundsicherung garantiert werden."}]}]], "screeners": [{"id": "G-DE_H07-1-DE_H03-2", "line_ids": ["DE_H07-1", "DE_H03-2"], "sentences": [{"idx": 1, "text": "Diesen Weg gehen wir weiter."}, {"idx": 2, "text": "DIE LINKE wird u.a. weiterhin darauf hinwirken, dass Unternehmen dazu gedrängt werden, Menschen mit Behinderung einzustellen, das Teilhaberecht menschenrechtskonform überarbeitet sowie eine vollständige Barrierefreiheit geschaffen wird.“"}], "gold": {"lines": [{"status": "one_qs", "cuts": []}, {"status": "split", "cuts": [16, 20]}]}}], "screener_every": 3, "pilot": true, "preview_training": false, "guide_html": "<h1>Annotation guidelines: Political sentences: where does a new statement begin? — German</h1><p class=\"lead\">You will see short paragraphs, one sentence per line, and mark where a new political statement (a quasi-sentence) begins inside a sentence.</p>\n<h2>1. Definitions</h2><p class=\"gnum\"><b>1.1 Sentence:</b> one line on the screen. Every line is exactly one sentence of the original text.</p><p class=\"gnum\"><b>1.2 Quasi-sentence:</b> one unit of meaning: one statement, demand, measure, judgement or fact. A sentence contains one or several quasi-sentences; a quasi-sentence never runs across two sentences.</p><p class=\"gnum\"><b>1.3 Boundary:</b> the point where one unit of meaning ends and the next begins — usually at a semicolon, a comma, or at “and” / “but”, but you decide.</p><h2>2. Task description</h2><p>For every line decide whether it contains one unit of meaning or several. To mark a boundary, click the space between two words: a red line appears and the new quasi-sentence is shaded. Click the red line again to remove it. If the whole line is one unit of meaning, press “one quasi-sentence”. Every line must be resolved before you can continue.</p>\n<h2>3. Guidelines and examples</h2><p class=\"lead\">✓ = correct coding (answer of the research team) · ✗ = wrong coding. All examples were coded identically by both experts.</p><div class=\"gl\"><p class=\"gnum\"><b>3.1</b> Separate demands or measures are separate quasi-sentences, even when they share one verb or are joined by “and” or a semicolon.</p><div class=\"card ex ok\"><div class=\"part\">✓ correct</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Wir</span><span class=\"gap\"></span><span class=\"w\">wollen</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">Abgeltungssteuer</span><span class=\"gap\"></span><span class=\"w\">von</span><span class=\"gap\"></span><span class=\"w\">25</span><span class=\"gap\"></span><span class=\"w\">auf</span><span class=\"gap\"></span><span class=\"w\">32</span><span class=\"gap\"></span><span class=\"w\">Prozent</span><span class=\"gap\"></span><span class=\"w\">erhöhen</span><span class=\"gap cut\"></span><span class=\"w seg1\">und</span><span class=\"gap seg1\"></span><span class=\"w seg1\">eine</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Finanztransaktionssteuer</span><span class=\"gap seg1\"></span><span class=\"w seg1\">einführen,</span><span class=\"gap seg1\"></span><span class=\"w seg1\">die</span><span class=\"gap seg1\"></span><span class=\"w seg1\">zu</span><span class=\"gap seg1\"></span><span class=\"w seg1\">85</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Prozent</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Geschäfte</span><span class=\"gap seg1\"></span><span class=\"w seg1\">zwischen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Finanzinstitutionen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">betrifft.</span><span class=\"cnt\">2 quasi-sentences</span></div><p class=\"how\">Both experts agree: two measures — raise the Abgeltungssteuer, and introduce a Finanztransaktionssteuer — so two units of meaning, cut at “und”. The relative clause “die zu 85 Prozent … betrifft” describes the second measure and stays with it.</p></div><div class=\"card ex bad\"><div class=\"part\">✗ wrong</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Wir</span><span class=\"gap\"></span><span class=\"w\">wollen</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">Abgeltungssteuer</span><span class=\"gap\"></span><span class=\"w\">von</span><span class=\"gap\"></span><span class=\"w\">25</span><span class=\"gap\"></span><span class=\"w\">auf</span><span class=\"gap\"></span><span class=\"w\">32</span><span class=\"gap\"></span><span class=\"w\">Prozent</span><span class=\"gap\"></span><span class=\"w\">erhöhen</span><span class=\"gap\"></span><span class=\"w\">und</span><span class=\"gap\"></span><span class=\"w\">eine</span><span class=\"gap\"></span><span class=\"w\">Finanztransaktionssteuer</span><span class=\"gap\"></span><span class=\"w\">einführen,</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">zu</span><span class=\"gap\"></span><span class=\"w\">85</span><span class=\"gap\"></span><span class=\"w\">Prozent</span><span class=\"gap\"></span><span class=\"w\">Geschäfte</span><span class=\"gap\"></span><span class=\"w\">zwischen</span><span class=\"gap\"></span><span class=\"w\">Finanzinstitutionen</span><span class=\"gap\"></span><span class=\"w\">betrifft.</span><span class=\"cnt\">one quasi-sentence</span></div><p class=\"how\">Marking the whole line as one quasi-sentence hides that it contains several separate demands.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.2</b> Words that only introduce a statement — “The right answer is:”, “In particular:”, “he told the paper that” — belong to the statement they introduce. Do not cut after them.</p><div class=\"card ex ok\"><div class=\"part\">✓ correct</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Die</span><span class=\"gap\"></span><span class=\"w\">richtige</span><span class=\"gap\"></span><span class=\"w\">Antwort</span><span class=\"gap\"></span><span class=\"w\">lautet:</span><span class=\"gap\"></span><span class=\"w\">Alle</span><span class=\"gap\"></span><span class=\"w\">Kinder</span><span class=\"gap\"></span><span class=\"w\">und</span><span class=\"gap\"></span><span class=\"w\">Jugendlichen</span><span class=\"gap\"></span><span class=\"w\">in</span><span class=\"gap\"></span><span class=\"w\">Deutschland</span><span class=\"gap\"></span><span class=\"w\">müssen</span><span class=\"gap\"></span><span class=\"w\">das</span><span class=\"gap\"></span><span class=\"w\">Recht</span><span class=\"gap\"></span><span class=\"w\">auf</span><span class=\"gap\"></span><span class=\"w\">qualitativ</span><span class=\"gap\"></span><span class=\"w\">hochwertige</span><span class=\"gap\"></span><span class=\"w\">Bildung</span><span class=\"gap\"></span><span class=\"w\">von</span><span class=\"gap\"></span><span class=\"w\">der</span><span class=\"gap\"></span><span class=\"w\">Kita</span><span class=\"gap\"></span><span class=\"w\">bis</span><span class=\"gap\"></span><span class=\"w\">zur</span><span class=\"gap\"></span><span class=\"w\">Hochschule</span><span class=\"gap\"></span><span class=\"w\">haben.</span><span class=\"cnt\">one quasi-sentence</span></div><p class=\"how\">Both experts agree: one unit of meaning. “Die richtige Antwort lautet:” only introduces the demand that follows; introduction and demand together are one quasi-sentence.</p></div><div class=\"card ex bad\"><div class=\"part\">✗ wrong</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Die</span><span class=\"gap\"></span><span class=\"w\">richtige</span><span class=\"gap\"></span><span class=\"w\">Antwort</span><span class=\"gap\"></span><span class=\"w\">lautet:</span><span class=\"gap cut\"></span><span class=\"w seg1\">Alle</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Kinder</span><span class=\"gap seg1\"></span><span class=\"w seg1\">und</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Jugendlichen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">in</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Deutschland</span><span class=\"gap seg1\"></span><span class=\"w seg1\">müssen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">das</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Recht</span><span class=\"gap seg1\"></span><span class=\"w seg1\">auf</span><span class=\"gap seg1\"></span><span class=\"w seg1\">qualitativ</span><span class=\"gap seg1\"></span><span class=\"w seg1\">hochwertige</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Bildung</span><span class=\"gap seg1\"></span><span class=\"w seg1\">von</span><span class=\"gap seg1\"></span><span class=\"w seg1\">der</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Kita</span><span class=\"gap seg1\"></span><span class=\"w seg1\">bis</span><span class=\"gap seg1\"></span><span class=\"w seg1\">zur</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Hochschule</span><span class=\"gap seg1\"></span><span class=\"w seg1\">haben.</span><span class=\"cnt\">2 quasi-sentences</span></div><p class=\"how\">The introduction carries no statement of its own; cutting it off creates a quasi-sentence without meaning.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.3</b> Details, conditions, comparisons and explanations of one statement stay with it. Not every comma or “and” is a boundary.</p><div class=\"card ex ok\"><div class=\"part\">✓ correct</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Je</span><span class=\"gap\"></span><span class=\"w\">weiter</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">Meinungen</span><span class=\"gap\"></span><span class=\"w\">zwischen</span><span class=\"gap\"></span><span class=\"w\">Arm</span><span class=\"gap\"></span><span class=\"w\">und</span><span class=\"gap\"></span><span class=\"w\">Reich</span><span class=\"gap\"></span><span class=\"w\">auseinanderliegen,</span><span class=\"gap\"></span><span class=\"w\">desto</span><span class=\"gap\"></span><span class=\"w\">unwahrscheinlicher</span><span class=\"gap\"></span><span class=\"w\">ist</span><span class=\"gap\"></span><span class=\"w\">es,</span><span class=\"gap\"></span><span class=\"w\">dass</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">Anliegen</span><span class=\"gap\"></span><span class=\"w\">der</span><span class=\"gap\"></span><span class=\"w\">ärmeren</span><span class=\"gap\"></span><span class=\"w\">Gruppen</span><span class=\"gap\"></span><span class=\"w\">Gehör</span><span class=\"gap\"></span><span class=\"w\">finden.</span><span class=\"cnt\">one quasi-sentence</span></div><p class=\"how\">Both experts agree: one unit of meaning. “Je weiter …, desto unwahrscheinlicher …” is one statement about one relationship, even though it has two halves.</p></div><div class=\"card ex bad\"><div class=\"part\">✗ wrong</div><div class=\"sent\" lang=\"de\"><span class=\"w\">Je</span><span class=\"gap\"></span><span class=\"w\">weiter</span><span class=\"gap\"></span><span class=\"w\">die</span><span class=\"gap\"></span><span class=\"w\">Meinungen</span><span class=\"gap\"></span><span class=\"w\">zwischen</span><span class=\"gap\"></span><span class=\"w\">Arm</span><span class=\"gap\"></span><span class=\"w\">und</span><span class=\"gap\"></span><span class=\"w\">Reich</span><span class=\"gap\"></span><span class=\"w\">auseinanderliegen,</span><span class=\"gap cut\"></span><span class=\"w seg1\">desto</span><span class=\"gap seg1\"></span><span class=\"w seg1\">unwahrscheinlicher</span><span class=\"gap seg1\"></span><span class=\"w seg1\">ist</span><span class=\"gap seg1\"></span><span class=\"w seg1\">es,</span><span class=\"gap seg1\"></span><span class=\"w seg1\">dass</span><span class=\"gap seg1\"></span><span class=\"w seg1\">die</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Anliegen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">der</span><span class=\"gap seg1\"></span><span class=\"w seg1\">ärmeren</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Gruppen</span><span class=\"gap seg1\"></span><span class=\"w seg1\">Gehör</span><span class=\"gap seg1\"></span><span class=\"w seg1\">finden.</span><span class=\"cnt\">2 quasi-sentences</span></div><p class=\"how\">The two parts are halves of one statement; neither makes sense as a separate unit of meaning.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.4</b> Length is not the criterion: a long sentence can be one quasi-sentence, a short one can contain two.</p></div><div class=\"gl\"><p class=\"gnum\"><b>3.5</b> When you are unsure whether a part is a unit of its own, do not cut.</p></div>"}</script>
+<script id="config" type="application/json">{
+  "platform": "prolific",
+  "completion_code": "PP326F66",
+  "screenout_code": "PXZSMDSV",
+  "submit_url": "https://script.google.com/macros/s/AKfycbwXglSJs6gpk2Q3ACGvM32kLeQuPXNfEPTH5Nu7IIgV8gvyVW6jnmgwmQhV2L5T-oataA/exec",
+  "prolific_return_url": "",
+  "prolific_screenout_url": "",
+  "cloudresearch_return_url": "",
+  "cloudresearch_screenout_url": "",
+  "complete_after": "task",
+  "id_params": {
+    "prolific": [
+      "PROLIFIC_PID",
+      "STUDY_ID",
+      "SESSION_ID"
+    ],
+    "cloudresearch": [
+      "participantId",
+      "projectId",
+      "assignmentId",
+      "workerId"
+    ]
+  }
+}</script>
+<script>
+// app.js v11 — practice phase is hands-on (answer first, then the research team's answer), skipped when a task has no practice items; v10 — guidelines screen (embedded TRAINING_*.html) shown first after the introduction; Guidelines button in the header reopens it.
+(function () {
+
+  var D = JSON.parse(document.getElementById('data').textContent);
+  var CFG = JSON.parse(document.getElementById('config').textContent);
+  var KEY = 'annotation-' + D.mode + '-' + D.built;
+  var GOLD = D.mode === 'gold';
+  var app = document.getElementById('app');
+
+  // ---------- platform context (Prolific / CloudResearch Connect) ----------
+  function params() {
+    var q = {}, s = String(location.search || '').replace(/^\?/, '');
+    if (!s) return q;
+    s.split('&').forEach(function (kv) {
+      if (!kv) return;
+      var i = kv.indexOf('=');
+      var k = i < 0 ? kv : kv.slice(0, i);
+      var v = i < 0 ? '' : kv.slice(i + 1);
+      try { q[decodeURIComponent(k)] = decodeURIComponent(v.replace(/\+/g, ' ')); }
+      catch (e) { q[k] = v; }
+    });
+    return q;
+  }
+  function detect(q) {
+    var names = Object.keys(q), lower = {};
+    names.forEach(function (n) { lower[n.toLowerCase()] = n; });
+    function pick(list) {
+      for (var i = 0; i < list.length; i++) {
+        var hit = lower[list[i].toLowerCase()];
+        if (hit && q[hit]) return hit;
+      }
+      return null;
+    }
+    var plat = { name: 'none', pid: '', study: '', session: '', query: location.search || '' };
+    var pp = pick(CFG.id_params.prolific);
+    var cc = pick(CFG.id_params.cloudresearch);
+    if (pp) plat.name = 'prolific';
+    else if (cc) plat.name = 'cloudresearch';
+    else if (q.platform === 'prolific' || q.platform === 'cloudresearch') plat.name = q.platform;
+    var order = plat.name === 'cloudresearch'
+      ? CFG.id_params.cloudresearch.concat(CFG.id_params.prolific)
+      : CFG.id_params.prolific.concat(CFG.id_params.cloudresearch);
+    var idk = pick(order);
+    if (idk) plat.pid = q[idk];
+    var sk = pick(['STUDY_ID', 'projectId', 'project_id']);
+    if (sk) plat.study = q[sk];
+    var ssk = pick(['SESSION_ID', 'assignmentId', 'assignment_id']);
+    if (ssk) plat.session = q[ssk];
+    plat.dry = q.dry_run === '1' || q.preview === '1';
+    return plat;
+  }
+  var Q = params();
+  var PLAT = detect(Q);
+
+  // ---------- state ----------
+  // Health probe. A sandboxed preview (Dropbox, Drive, an e-mail client) can make
+  // localStorage throw and block downloads; silently swallowing that is how a whole
+  // session gets lost, so it is detected up front and shown on every screen.
+  var STORAGE_OK = (function () {
+    try {
+      var t = '__probe_' + Date.now();
+      localStorage.setItem(t, '1');
+      var ok = localStorage.getItem(t) === '1';
+      localStorage.removeItem(t);
+      return ok;
+    } catch (e) { return false; }
+  })();
+  var FRAMED = (function () { try { return window.top !== window.self; } catch (e) { return true; } })();
+  var SAVE_FAILED = false;
+
+  function load() { try { var v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) { SAVE_FAILED = true; }
+  }
+  var S = load() || { coder: '', ans: {}, started: new Date().toISOString() };
+  if (!S.started) S.started = new Date().toISOString();
+  S.plat = PLAT;
+  save();
+
+  // ---------- older builds (answers from a previous version of this page) ----------
+  var CARRY = ['q1', 'q2', 'q4', 'q5', 'econ', 'chances', 'rights', 'note', 'cuts'];
+  function coded(st) {
+    var n = 0;
+    if (st && st.ans) Object.keys(st.ans).forEach(function (ik) {
+      var a = st.ans[ik];
+      for (var f = 0; f < CARRY.length; f++) if (a[CARRY[f]] !== undefined) { n++; return; }
+    });
+    return n;
+  }
+  // Older slots for this mode, richest first: a build that was merely opened must not
+  // shadow one that was actually coded in.
+  function olderKeys() {
+    var out = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!k || k.indexOf('annotation-' + D.mode + '-') !== 0 || k === KEY) continue;
+        var n = 0;
+        try { n = coded(JSON.parse(localStorage.getItem(k))); } catch (e) {}
+        if (n) out.push({ key: k, n: n, build: k.slice(('annotation-' + D.mode + '-').length) });
+      }
+    } catch (e) {}
+    out.sort(function (x, y) { return y.n - x.n || (x.build < y.build ? 1 : -1); });
+    return out;
+  }
+  function importOlder(k) {
+    var old;
+    try { old = JSON.parse(localStorage.getItem(k)); } catch (e) { return 0; }
+    if (!old || !old.ans) return 0;
+    var n = 0;
+    Object.keys(old.ans).forEach(function (ik) {
+      var from = old.ans[ik], to = S.ans[ik] || (S.ans[ik] = {}), took = false;
+      CARRY.forEach(function (f) {
+        if (from[f] !== undefined && to[f] === undefined) { to[f] = from[f]; took = true; }
+      });
+      if (took) n++;
+    });
+    if (!S.coder && old.coder) S.coder = old.coder;
+    save();
+    return n;
+  }
+
+  // ---------- helpers ----------
+  function el(tag, props, kids) {
+    var n = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (k === 'text') n.textContent = v;
+      else if (k === 'cls') n.className = v;
+      else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function items(t) {
+    if (t.type === 'crowd') return t.items.map(function (x) { return { kind: x.kind || crowdKind(), d: x }; });
+    if (t.type === 't1') {
+      return t.articles.map(function (a) { return { kind: 'article', d: a }; })
+        .concat(t.splits.map(function (p) { return { kind: 'split', d: p }; }));
+    }
+    return t.items.map(function (q) { return { kind: 'qs', d: q }; });
+  }
+  function lang(t) { if (CROWD) return D.lang || 'en'; return /-DE$/.test(t.id) ? 'de' : 'en'; }
+  function key(t, it) { return t.id + '|' + it.d.id; }
+  function A(t, it) { var k = key(t, it); if (!S.ans[k]) S.ans[k] = {}; return S.ans[k]; }
+  function peek(t, it) { return S.ans[key(t, it)] || {}; }
+  function toks(s) { return s.text.split(/\s+/).filter(Boolean); }
+
+  // a split line is resolved when it carries a cut or was marked as one quasi-sentence
+  function lineState(a, si) {
+    var c = (a.cuts || {})[si] || [];
+    if (c.length) return 'split';
+    if ((a.nosplit || {})[si]) return 'one_qs';
+    return 'unresolved';
+  }
+  function done(t, it) {
+    var a = peek(t, it);
+    if (it.kind === 'article') return it.d.press ? !!a.q2 : (a.q1 === 'no' || (a.q1 === 'yes' && !!a.q2));
+    if (it.kind === 'split') {
+      for (var si = 0; si < it.d.sentences.length; si++) if (lineState(a, si) === 'unresolved') return false;
+      return true;
+    }
+    return a.q4 === 'no' || (a.q4 === 'yes' && !!a.q5 && !!(a.econ || a.chances || a.rights));
+  }
+  function progress(t) {
+    var its = items(t), n = 0;
+    its.forEach(function (it) { if (done(t, it)) n++; });
+    return [n, its.length];
+  }
+  function allDone() {
+    for (var i = 0; i < D.tasks.length; i++) { var p = progress(D.tasks[i]); if (p[0] < p[1]) return false; }
+    return true;
+  }
+
+  function banner() {
+    if (STORAGE_OK && !FRAMED && !SAVE_FAILED) return null;
+    var why = (!STORAGE_OK || SAVE_FAILED)
+      ? 'This browser is NOT saving your answers. '
+      : 'This page is open inside another website, so the download may be blocked. ';
+    return el('div', { cls: 'alarm' }, [
+      el('strong', { text: 'Stop \u2014 do not code in this window. ' }),
+      el('span', { text: why +
+        'Close it, download the file to your computer, and open it from there (double-click it). ' +
+        'The page needs no internet. Opening it from inside Dropbox, Drive or an e-mail preview ' +
+        'does not work.' })]);
+  }
+  function setHead(title, i, n) {
+    document.getElementById('htitle').textContent = title;
+    document.getElementById('hprog').textContent = i == null ? '' : 'Item ' + (i + 1) + ' of ' + n;
+    document.getElementById('hbar').style.width = i == null ? '0' : (100 * (i + 1) / n) + '%';
+  }
+
+
+  // ================= crowd mode: training -> entry test -> production (+ hidden screeners) =================
+  var CROWD = D.mode === 'crowd';
+  function crowdKind() { return D.task === 'T1_scope' ? 'article' : D.task === 'T1_split' ? 'split' : 'qs'; }
+  function hash32(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i);
+    h = ((h & 0xffff) * 16777619 + ((((h >>> 16) * 16777619) & 0xffff) << 16)) >>> 0; } return h >>> 0; }
+  function chooseBatch() {
+    var n = (D.batches || []).length || 1, q = parseInt(Q.batch, 10);
+    if (q >= 1 && q <= n) return q;
+    if (PLAT.pid) return 1 + (hash32(PLAT.pid) % n);
+    return 1;
+  }
+  // one screener after every `every` production items, never two in a row, never as the last item
+  function interleave(prod, scr, every) {
+    var out = [], si = 0;
+    for (var i = 0; i < prod.length; i++) {
+      out.push(prod[i]);
+      if (scr.length && every > 0 && (i + 1) % every === 0 && i < prod.length - 1) { out.push(scr[si % scr.length]); si++; }
+    }
+    return out;
+  }
+  var BATCH = null;
+  if (CROWD) {
+    BATCH = chooseBatch();
+    D.tasks = [
+      { id: 'training', phase: 'training', type: 'crowd', title: 'Practice', items: D.training || [], q2: D.q2 },
+      { id: 'entry', phase: 'entry', type: 'crowd', title: 'Qualification', items: (D.entry && D.entry.items) || [], q2: D.q2 },
+      { id: 'production', phase: 'production', type: 'crowd', title: 'Coding',
+        items: interleave((D.batches || [[]])[BATCH - 1] || [], D.screeners || [], D.screener_every || 15), q2: D.q2 }
+    ];
+    if (!S.t) S.t = {};
+    S.batch = BATCH; save();
+  }
+  function phaseTask(name) { for (var i = 0; i < D.tasks.length; i++) if (D.tasks[i].phase === name) return D.tasks[i]; return null; }
+  function stamp(name) { if (CROWD && !S.t[name]) { S.t[name] = new Date().toISOString(); save(); } }
+  function secs(a, b) { return (a && b) ? Math.round((new Date(b) - new Date(a)) / 1000) : null; }
+
+  // ---- per-item scoring against gold (shared by entry test and screeners) ----
+  function scoreItem(t, it) {
+    var a = peek(t, it), g = it.d.gold || {}, r = { item_id: it.d.id, kind: it.kind };
+    if (it.kind === 'article') {
+      r.q1_correct = (g.q1 === undefined) ? true : a.q1 === g.q1;
+      r.scope_correct = (g.q1 === 'no') ? r.q1_correct : (!!g.q2 && a.q2 === g.q2);
+      r.nonpolitical = g.q1 === 'no';
+      r.pass = r.scope_correct && r.q1_correct;
+    } else if (it.kind === 'split') {
+      var lines = g.lines || [], ok = 0, det = 0, nsplit = 0;
+      r.lines = [];
+      lines.forEach(function (gl, si) {
+        var st = lineState(a, si), cuts = (a.cuts && a.cuts[si]) || [];
+        var statusOk = st === gl.status;
+        var detected = false;
+        if (gl.status === 'split') {
+          nsplit++;
+          detected = st === 'split' && (gl.cuts == null || cuts.some(function (c) { return gl.cuts.indexOf(c) >= 0; }));
+          if (detected) det++;
+        }
+        if (statusOk) ok++;
+        r.lines.push({ si: si, status_correct: statusOk, detected: detected });
+      });
+      r.n_lines = lines.length; r.status_correct = ok; r.n_split_lines = nsplit; r.split_detected = det;
+      r.pass = ok === lines.length && det === nsplit;
+    } else {
+      r.q4_correct = !!g.q4 && a.q4 === g.q4;
+      r.type_hit = g.q4 === 'yes' && a.q4 === 'yes' &&
+        ((g.econ && a.econ) || (g.chances && a.chances) || (g.rights && a.rights)) ? true : false;
+      r.pass = r.q4_correct && (g.q4 === 'no' || r.type_hit);
+    }
+    return r;
+  }
+  function scoreEntry() {
+    var t = phaseTask('entry'), its = items(t), rule = (D.entry && D.entry.rule) || {};
+    var per = its.map(function (it) { return scoreItem(t, it); });
+    var res = { per_item: per, rule: rule };
+    if (D.task === 'T1_scope') {
+      res.scope_correct = per.filter(function (p) { return p.scope_correct; }).length;
+      res.passed = res.scope_correct >= (rule.min_scope_correct || its.length) &&
+        per.every(function (p) { return p.q1_correct; });
+    } else if (D.task === 'T1_split') {
+      res.status_correct = per.reduce(function (s_, p) { return s_ + p.status_correct; }, 0);
+      res.n_lines = per.reduce(function (s_, p) { return s_ + p.n_lines; }, 0);
+      res.split_detected = per.reduce(function (s_, p) { return s_ + p.split_detected; }, 0);
+      res.n_split_lines = per.reduce(function (s_, p) { return s_ + p.n_split_lines; }, 0);
+      res.passed = res.status_correct >= (rule.min_status_correct || res.n_lines) &&
+        res.split_detected >= (rule.min_split_detected || 1);
+    } else {
+      res.q4_correct = per.filter(function (p) { return p.q4_correct; }).length;
+      res.type_hit = per.filter(function (p) { return p.type_hit; }).length;
+      res.passed = res.q4_correct >= (rule.min_q4_correct || its.length) &&
+        res.type_hit >= (rule.min_type_hit || 1);
+    }
+    return res;
+  }
+  function scoreScreeners() {
+    var t = phaseTask('production'); if (!t) return [];
+    return items(t).filter(function (it) { return !!it.d.gold; }).map(function (it) {
+      var r = scoreItem(t, it); return { item_id: r.item_id, passed: !!r.pass, answered: done(t, it) };
+    });
+  }
+
+  // ---- crowd screens ----
+  var PREVIEW = (params().preview === 'training') || !!D.preview_training;
+  function previewEnd() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'End of the preview' }),
+      el('p', { text: 'In the real study the qualification would start here. This preview shows only the instructions and the practice examples.' })]));
+    app.appendChild(el('div', { cls: 'nav' }, [el('button', { text: 'Back to the start', onclick: crowdMenu }), el('button', { cls: 'primary', text: 'See the examples again', onclick: function () { startPhase('training'); } })]));
+  }
+  function crowdMenu() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var where = PLAT.name === 'none' ? 'Opened outside a recruitment platform: nothing you enter is collected.'
+      : 'Opened from ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') +
+        (PLAT.pid ? '.' : ' (no participant id in the link).') + (PLAT.dry ? ' Dry run: nothing will be submitted.' : '');
+    var steps = [
+      D.guide_html ? 'Guidelines: the definitions, the task and examples with the correct and the wrong coding. Please read them first; you can reopen them at any time with the Guidelines button at the top.' : null,
+      (D.training || []).length ? 'Practice (short, not scored): ' + (D.training || []).length + ' example' + ((D.training || []).length === 1 ? '' : 's') + ' you code yourself, each followed by the answer of the research team.' : null,
+      'Qualification: ' + ((D.entry && D.entry.items) || []).length + ' items you code yourself; you continue only if you pass.',
+      'Coding: ' + ((D.batches || [[]])[BATCH - 1] || []).length + ' items. At the end you receive your completion code.'];
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: D.title || 'Annotation task' }),
+      el('p', { text: D.intro || '' }),
+      PREVIEW ? el('p', { cls: 'how', text: 'PREVIEW for the research team: this file shows the instructions and the practice examples exactly as coders will see them. Nothing is recorded or sent.' }) : el('span'),
+      el('ol', null, steps.filter(function (x) { return x; }).map(function (x) { return el('li', { text: x }); })),
+      el('p', { cls: 'how', text: where })]));
+    var label = 'Start', target = 'training';
+    if (S.entry && S.entry.passed) { label = 'Continue coding'; target = 'production'; }
+    else if (S.entry && !S.entry.passed) { label = 'Show result'; target = 'screenout'; }
+    else if (S.t.training_end) { label = 'Continue to qualification'; target = 'entry'; }
+    else if (S.t.training) { label = 'Continue the practice'; target = 'training'; }
+    else if (D.guide_html && !S.t.guide_read) { label = 'Start'; target = 'guide'; }
+    app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: label, onclick: function () {
+      if (target === 'screenout') return screenOut();
+      if (target === 'guide') return showGuide();
+      startPhase(target);
+    } })]));
+  }
+  // ---- guidelines: the first screen after the introduction; reopenable from the header at any time ----
+  function guideNode() { var n = el('div', { cls: 'card guide' }); n.innerHTML = D.guide_html || ''; return n; }
+  function showGuide() {
+    setHead(D.title || 'Annotation task', null); stamp('guide_open');
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    app.appendChild(el('p', { cls: 'how', text: 'Please read the guidelines below. The same text stays available during the whole task: click Guidelines at the top of the page.' }));
+    app.appendChild(guideNode());
+    app.appendChild(el('div', { cls: 'nav' }, [el('button', { text: 'Back', onclick: menu }),
+      el('button', { cls: 'primary', text: 'I have read the guidelines \u2014 continue to the ' + ((D.training || []).length ? 'practice' : 'qualification'), onclick: function () {
+        S.t.guide_read = new Date().toISOString(); save(); startPhase('training'); } })]));
+    window.scrollTo(0, 0);
+  }
+  function guideOverlay() {
+    var ov = el('div', { cls: 'overlay' });
+    var box = el('div', { cls: 'overlay-box' }, [
+      el('div', { cls: 'nav' }, [el('span', { cls: 'ttl', text: 'Guidelines' }), el('button', { cls: 'primary', text: 'Close', onclick: function () { ov.remove(); } })]),
+      guideNode()]);
+    ov.appendChild(box); ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
+  function startPhase(name) {
+    var t = phaseTask(name); stamp(name);
+    if (name === 'training' && !(D.training || []).length) { S.t.training_end = S.t.training_end || new Date().toISOString(); save(); return startPhase('entry'); }   // no practice items: straight to the qualification
+    if (name === 'training') return showTraining(t, 0);
+    start(t);
+  }
+  function goldSummary(it) {
+    var g = it.d.gold || {}, out = [];
+    if (it.kind === 'article') {
+      if (g.q1 !== undefined) out.push('Q1 political: ' + g.q1);
+      if (g.q2) out.push('Q2 scope: ' + g.q2);
+    } else if (it.kind === 'qs') {
+      out.push('Q4 refers to equality: ' + g.q4);
+      if (g.q4 === 'yes') out.push('Q5 kind: ' + ['econ', 'chances', 'rights'].filter(function (k) { return g[k]; })
+        .map(function (k) { return { econ: 'economic equality', chances: 'equal chances', rights: 'equal rights' }[k]; }).join(', '));
+      if (g.q4 === 'yes' && g.q5) out.push('Q6 position: ' + g.q5);
+    } else if (it.kind === 'split') {
+      (g.lines || []).forEach(function (gl, si) {
+        var c = (gl.cuts || []).length;
+        out.push('Line ' + (si + 1) + ': ' + (gl.status === 'split'
+          ? (c + 1) + ' quasi-sentences (the cut' + (c > 1 ? 's are' : ' is') + ' marked in the line above)'
+          : 'one quasi-sentence \u2014 no cut'));
+      });
+    }
+    return out;
+  }
+  function expertCard(t, it) {
+    var g = it.d.gold || {}, kids = [el('h3', { text: 'Answer of the research team' })];
+    if (it.kind === 'split') {
+      (it.d.sentences || []).forEach(function (snt, si) {
+        var gl = (g.lines || [])[si] || {}, tk = toks(snt), cuts = gl.cuts || [], seg = 0;
+        var line = el('div', { cls: 'sent', lang: lang(t) });
+        tk.forEach(function (w, j) {
+          if (j > 0 && cuts.indexOf(j) >= 0) { seg++; line.appendChild(el('span', { cls: 'gap cut' })); }
+          else if (j > 0) line.appendChild(el('span', { cls: 'gap' + (seg ? (seg % 2 ? ' seg1' : ' seg2') : '') }));
+          line.appendChild(el('span', { cls: 'w' + (seg ? (seg % 2 ? ' seg1' : ' seg2') : ''), text: w }));
+        });
+        line.appendChild(el('span', { cls: 'cnt', text: gl.status === 'split' ? ((cuts.length || 1) + 1) + ' quasi-sentences' : 'one quasi-sentence' }));
+        kids.push(line);
+      });
+    }
+    kids = kids.concat(goldSummary(it).map(function (x) { return el('p', { cls: 'ans', text: x }); }))
+      .concat(g.note ? [el('p', { cls: 'how', text: g.note })] : []);
+    return el('div', { cls: 'card gold' }, kids);
+  }
+  function showTraining(t, i) { return show(t, i); }
+  function entryFinish() {
+    S.entry = scoreEntry(); S.t.entry_end = new Date().toISOString(); save();
+    if (S.entry.passed) {
+      app.innerHTML = '';
+      app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'Qualification passed' }),
+        el('p', { text: 'Thank you. The coding task starts now. From here on there are no more examples with answers.' })]));
+      app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: 'Start coding', onclick: function () { startPhase('production'); } })]));
+      return;
+    }
+    screenOut();
+  }
+  function screenOut() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    var card = el('div', { cls: 'card' }, [el('h2', { text: 'Thank you for taking part' }),
+      el('p', { text: 'Based on the qualification items, this study is not a good match, so it ends here. ' +
+        'You will be paid for the time spent on the qualification according to the study description.' })]);
+    app.appendChild(card);
+    var nav = el('div', { cls: 'nav' }, [el('span')]);
+    app.appendChild(nav);
+    function showCode() {
+      var code = CFG.screenout_code || '';
+      card.appendChild(el('p', { text: 'Your code is:' }));
+      card.appendChild(el('p', null, [el('span', { cls: 'code', text: code })]));
+      var url = '';
+      if (PLAT.name === 'prolific') url = CFG.prolific_screenout_url || ('https://app.prolific.com/submissions/complete?cc=' + encodeURIComponent(code));
+      else if (PLAT.name === 'cloudresearch') url = CFG.cloudresearch_screenout_url || '';
+      if (url) nav.appendChild(el('a', { cls: 'btn primary', href: url, text: 'Return to ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') }));
+      else card.appendChild(el('p', { text: 'Copy this code into the platform.' }));
+    }
+    if (!CFG.submit_url || PLAT.dry) { showCode(); return; }
+    submit(function () { showCode(); }, 'screened_out');
+  }
+
+  // ---------- menu ----------
+  function menu() {
+    if (CROWD) return crowdMenu();
+    setHead(GOLD ? 'Gold coding' : 'Annotation demo', null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var msg = el('span', { cls: 'msg' });
+    var name = el('input', { type: 'text', id: 'coder', placeholder: 'Your initials', maxlength: '20' });
+    name.value = S.coder || '';
+    name.addEventListener('input', function () { S.coder = name.value.trim(); msg.textContent = ''; save(); });
+    app.appendChild(el('div', { cls: 'card' }, GOLD ? [
+      el('h2', { text: 'Gold coding: Task 1' }),
+      el('p', { text: 'Only the gold we are still missing: political and national scope of the articles, and the ' +
+        'quasi-sentence splits of the paragraphs. The screens are the ones crowd coders will see.' }),
+      el('p', { text: 'Answers are saved in this browser as you go. When you are done, click Download answers ' +
+        'and put the file in the shared Dropbox folder. If your browser refuses the download, use ' +
+        'Show answers as text and copy them out instead — nothing is lost either way.' }),
+      el('div', null, [el('label', { for: 'coder', text: 'Coder: ' }), name, msg])
+    ] : [
+      el('h2', { text: 'Demo: what crowd coders will see' }),
+      el('p', { text: 'One item per screen, with the question, what to do, the text and the answer buttons. ' +
+        'Coders see only their own language and never the outlet, party or date.' }),
+      el('p', { text: PLAT.name === 'none'
+        ? 'Opened outside a recruitment platform, so nothing you enter here is collected.'
+        : 'Opened from ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') +
+          (PLAT.pid ? ' as participant ' + PLAT.pid : ' (no participant id in the link)') +
+          (PLAT.dry ? ' \u2014 dry run, nothing will be submitted.' : '.') })
+    ]));
+
+    var old = olderKeys();
+    if (old.length) {
+      var note = el('span', { cls: 'msg' });
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('p', { text: 'Answers from an earlier version of this page were found in this browser. ' +
+          'You can carry over the article answers and any splits you already marked; lines you had not ' +
+          'split still need confirming.' }),
+        el('div', null, [
+          el('button', { text: 'Import ' + old[0].n + ' answered item(s) from build ' + old[0].build,
+            onclick: function () {
+            var n = importOlder(old[0].key);
+            note.textContent = n ? ('Imported ' + n + ' item(s).') : 'Nothing to import.';
+            if (n) menu();
+          } }), note])
+      ]));
+    }
+
+    var list = el('div', { cls: 'card' }, [el('h2', { text: 'Tasks' })]);
+    D.tasks.forEach(function (t) {
+      var p = progress(t);
+      list.appendChild(el('div', { cls: 'task' }, [
+        el('div', null, [el('div', { cls: 'tname', text: t.title }), el('div', { cls: 'id', text: t.note })]),
+        el('div', { cls: 'tright' }, [
+          el('span', { cls: 'id', text: p[0] + ' / ' + p[1] + ' done' }),
+          el('button', { cls: 'primary', text: p[0] === 0 ? 'Start' : (p[0] === p[1] ? 'Review' : 'Continue'),
+            onclick: function () {
+              if (GOLD && !S.coder) { msg.textContent = 'Enter your initials first.'; name.focus(); return; }
+              start(t);
+            } })
+        ])
+      ]));
+    });
+    app.appendChild(list);
+    if (GOLD) app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+      el('button', { text: 'Download answers (CSV)', onclick: download })]));
+  }
+
+  function start(t) {
+    var its = items(t);
+    for (var i = 0; i < its.length; i++) if (!done(t, its[i])) return show(t, i);
+    show(t, 0);
+  }
+
+  // ---------- building blocks ----------
+  function qcard(q, how, body) {
+    return el('div', { cls: 'card' }, [el('h3', { text: q }), how ? el('div', { cls: 'how', text: how }) : null, body]);
+  }
+  function radio(a, field, values, labels, onchange) {
+    return el('div', { cls: 'opts' }, values.map(function (v, k) {
+      return el('button', { cls: 'opt' + (a[field] === v ? ' on' : ''), type: 'button', text: labels ? labels[k] : v,
+        onclick: function () { a[field] = v; onchange(); } });
+    }));
+  }
+
+  // ---------- one item per screen ----------
+  function show(t, i) {
+    var its = items(t), it = its[i], a = A(t, it), PRACTICE = t.phase === 'training';
+    setHead(t.title, i, its.length);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    if (PRACTICE) app.appendChild(el('p', { cls: 'how', text: 'Practice example ' + (i + 1) + ' of ' + its.length +
+      ' (not scored). Answer first; the answer of the research team then appears below your answer.' }));
+    var qbox = el('div'), gbox = el('div');
+    var next = el('button', { cls: 'primary', text: i === its.length - 1 ? (PRACTICE ? (PREVIEW ? 'End of the preview' : 'Start the qualification') : 'Finish') : 'Next',
+      onclick: function () {
+        if (!done(t, it)) return;
+        if (i === its.length - 1) finish(t); else show(t, i + 1);
+      } });
+    function refresh() {
+      save();
+      qbox.innerHTML = '';
+      (it.kind === 'article' ? articleQs : it.kind === 'qs' ? qsQs : function () { return []; })(t, it, a, refresh)
+        .forEach(function (n) { if (n) qbox.appendChild(n); });
+      next.disabled = !done(t, it);
+      if (PRACTICE) { gbox.innerHTML = ''; if (done(t, it)) { if (!a.revealed) { a.revealed = new Date().toISOString(); save(); } gbox.appendChild(expertCard(t, it)); } }
+    }
+
+    if (it.kind === 'article') {
+      var body = [];
+      if (it.d.title) body.push(el('p', { cls: 'ttl', text: it.d.title }));
+      it.d.paras.forEach(function (p) { body.push(el('p', { text: p })); });
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('div', { cls: 'part', text: 'Part A \u00b7 Read the article, then answer' }),
+        el('div', { cls: 'text long', lang: lang(t) }, body)]));
+    } else if (it.kind === 'split') {
+      app.appendChild(qcard(D.instr.q3.q, D.instr.q3.how, null));
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('div', { cls: 'part', text: 'Part B \u00b7 One paragraph, one sentence per line' }),
+        el('div', { cls: 'hint', text: 'Every line needs an answer: either mark the splits inside it, or press ' +
+          '\u201cone quasi-sentence\u201d to say it holds just one.' })]
+        .concat(it.d.sentences.map(function (s, si) { return sentence(a, s, si, lang(t), refresh); }))));
+    } else {
+      var ctx = [];
+      if (it.d.prev) ctx.push(el('p', { cls: 'ctx', text: it.d.prev }));
+      ctx.push(el('p', null, [el('span', { cls: 'qs', text: it.d.qs })]));
+      if (it.d.next) ctx.push(el('p', { cls: 'ctx', text: it.d.next }));
+      if (!it.d.prev && !it.d.next) {
+        ctx.push(el('p', { cls: 'ctxnone', text: 'No surrounding sentences are available for this one. ' +
+          'Code it on its own.' }));
+      }
+      app.appendChild(el('div', { cls: 'card' }, [el('div', { cls: 'text', lang: lang(t) }, ctx)]));
+    }
+    app.appendChild(qbox); app.appendChild(gbox);
+
+    var note = el('textarea', { cls: 'note', placeholder: 'Expert note (optional; not part of the crowd version)' });
+    note.value = a.note || '';
+    note.addEventListener('input', function () { a.note = note.value; save(); });
+    if (GOLD) app.appendChild(el('div', { cls: 'card' }, [note]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: i === 0 ? (PRACTICE ? 'Back' : 'Tasks') : 'Back', onclick: function () { if (i === 0) menu(); else show(t, i - 1); } }),
+      el('span', { cls: 'id', text: PRACTICE ? 'Example ' + (i + 1) : 'Item ID ' + it.d.id }),
+      next]));
+    refresh();
+    window.scrollTo(0, 0);
+  }
+
+  function articleQs(t, it, a, refresh) {
+    var out = [];
+    if (it.d.press) {
+      out.push(el('div', { cls: 'card stop', text: 'Press release: political by definition, so Q1 is skipped.' }));
+    } else {
+      out.push(qcard(D.instr.q1.q, D.instr.q1.how, radio(a, 'q1', ['yes', 'no'], null, function () {
+        if (a.q1 === 'no') delete a.q2;
+        refresh();
+      })));
+    }
+    if (it.d.press || a.q1 === 'yes') {
+      out.push(qcard(t.q2.q, t.q2.how, radio(a, 'q2', ['national', 'international'], null, refresh)));
+    } else if (a.q1 === 'no') {
+      out.push(el('div', { cls: 'card stop', text: 'Not political: no further question for this article. Click Next.' }));
+    }
+    return out;
+  }
+
+  function qsQs(t, it, a, refresh) {
+    var out = [qcard(D.instr.q4.q, D.instr.q4.how, radio(a, 'q4', ['yes', 'no'], null, function () {
+      if (a.q4 === 'no') { delete a.q5; delete a.econ; delete a.chances; delete a.rights; }
+      refresh();
+    }))];
+    if (a.q4 === 'yes') {
+      out.push(qcard(D.instr.q5.q, D.instr.q5.how || '', el('div', { cls: 'opts' }, D.instr.q5.opts.map(function (o) {
+        return el('button', { cls: 'opt' + (a[o.key] ? ' on' : ''), type: 'button',
+          onclick: function () { var was = !!a[o.key]; delete a.econ; delete a.chances; delete a.rights; if (!was) a[o.key] = true; refresh(); } },
+          [el('span', { text: (a[o.key] ? '\u25c9 ' : '\u25cb ') + o.name }), el('small', { text: o.desc })]);
+      }))));
+      out.push(qcard(D.instr.q6.q, D.instr.q6.how,
+        radio(a, 'q5', ['supports', 'against', 'mentions'], ['supports', 'against', 'mentions only'], refresh)));
+    } else if (a.q4 === 'no') {
+      out.push(el('div', { cls: 'card stop', text: 'No reference to equality: Q5 and Q6 are skipped. Click Next.' }));
+    }
+    return out;
+  }
+
+  // ---------- the splitting widget ----------
+  function sentence(a, s, si, lg, onchange) {
+    var tk = toks(s);
+    if (!a.cuts) a.cuts = {};
+    if (!a.nosplit) a.nosplit = {};
+    var box = el('div', { cls: 'sent', lang: lg });
+    var last = 0, lastJ = -1;
+
+    function toggle(j) {
+      var now = Date.now();
+      if (j === lastJ && now - last < 400) return;   // only a repeat on the SAME gap is a double-click
+      last = now; lastJ = j;
+      var c = (a.cuts[si] || []).slice(), k = c.indexOf(j);
+      if (k >= 0) c.splice(k, 1); else c.push(j);
+      c.sort(function (x, y) { return x - y; });
+      a.cuts[si] = c;
+      if (c.length) delete a.nosplit[si];            // a split answers the line
+      draw(); onchange();
+    }
+    function one() {
+      if (a.nosplit[si]) delete a.nosplit[si];
+      else { a.nosplit[si] = true; a.cuts[si] = []; }
+      draw(); onchange();
+    }
+    function draw() {
+      var cuts = a.cuts[si] || [], seg = 0, st = lineState(a, si);
+      box.innerHTML = '';
+      box.className = 'sent' + (st === 'unresolved' ? ' todo' : '');
+      function shade() { return seg === 0 ? '' : (seg % 2 ? ' seg1' : ' seg2'); }
+      tk.forEach(function (w, j) {
+        if (j > 0) {
+          var on = cuts.indexOf(j) >= 0;
+          if (on) seg++;
+          box.appendChild(el('span', { cls: 'gap' + (on ? ' cut' : shade()), title: on ? 'Remove this split' : 'Split here',
+            onclick: function () { toggle(j); } }));
+        }
+        box.appendChild(el('span', { cls: 'w' + shade(), text: w }));
+      });
+      // offered only while the line carries no split, so marking it can never discard one
+      if (!cuts.length) {
+        box.appendChild(el('button', { cls: 'nos' + (st === 'one_qs' ? ' on' : ''), type: 'button',
+          text: (st === 'one_qs' ? '\u2611' : '\u2610') + ' one quasi-sentence', onclick: one }));
+      } else {
+        box.appendChild(el('span', { cls: 'cnt', text: (cuts.length + 1) + ' quasi-sentences' }));
+      }
+    }
+    draw();
+    return box;
+  }
+
+  // ---------- finish ----------
+  function pilotFeedback(t) {
+    setHead(t.title, null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var box = el('textarea', { cls: 'note', placeholder: 'Optional: anything unclear in the instructions or the examples? Anything that did not work on your screen?' });
+    box.style.minHeight = '120px';
+    app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'One last question (pilot)' }),
+      el('p', { text: 'This is a pilot run. Your comments help us fix the instructions before the main study. You can leave the box empty.' }), box]));
+    app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: 'Send and get my code', onclick: function () {
+      S.feedback = box.value || ''; S.feedback_done = true; save(); finish(t); } })]));
+  }
+  function finish(t) {
+    if (CROWD && t.phase === 'training') { S.t.training_end = new Date().toISOString(); save(); return PREVIEW ? previewEnd() : startPhase('entry'); }
+    if (CROWD && t.phase === 'entry') return entryFinish();
+    if (CROWD && t.phase === 'production' && !S.t.production_end) { S.t.production_end = new Date().toISOString(); save(); }
+    if (CROWD && D.pilot && t.phase === 'production' && !S.feedback_done) return pilotFeedback(t);
+    setHead(t.title, null);
+    app.innerHTML = '';
+    if (GOLD) {
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('h2', { text: 'Task finished' }),
+        el('p', { text: 'Thanks. Click Download answers and put the file in the shared Dropbox folder.' })]));
+      app.appendChild(el('div', { cls: 'nav' }, [
+        el('button', { text: 'Back to tasks', onclick: menu }),
+        el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+        el('button', { cls: 'primary', text: 'Download answers (CSV)', onclick: download })]));
+      return;
+    }
+    var card = el('div', { cls: 'card' }, [el('h2', { text: 'Task finished' })]);
+    app.appendChild(card);
+    var nav = el('div', { cls: 'nav' }, [CROWD ? el('span') : el('button', { text: 'Back to tasks', onclick: menu })]);
+    app.appendChild(nav);
+
+    function completion() {
+      var code = CFG.completion_code || '';
+      card.appendChild(el('p', { text: 'Your completion code is:' }));
+      card.appendChild(el('p', null, [el('span', { cls: 'code', text: code })]));
+      var url = '';
+      if (PLAT.name === 'prolific') {
+        url = CFG.prolific_return_url || ('https://app.prolific.com/submissions/complete?cc=' + encodeURIComponent(code));
+      } else if (PLAT.name === 'cloudresearch') {
+        url = CFG.cloudresearch_return_url || '';
+      }
+      if (url) {
+        card.appendChild(el('p', { text: 'Click the button to register your submission. ' +
+          'If the page does not return, copy the code above into the platform.' }));
+        nav.appendChild(el('a', { cls: 'btn primary', href: url, text: 'Return to ' +
+          (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') }));
+      } else {
+        card.appendChild(el('p', { text: 'Copy this code into the platform to register your submission.' }));
+      }
+      nav.appendChild(el('button', { text: 'Download a copy (CSV)', onclick: download }));
+      nav.appendChild(el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }));
+    }
+
+    // complete_after: 'task' = a code once this task is done (one task per participant,
+    // or a pilot); 'all' = every task in the file must be finished first.
+    if (!CROWD && CFG.complete_after !== 'task' && !allDone()) {
+      card.appendChild(el('p', { text: 'This task is finished, but other tasks are still open. ' +
+        'Go back to the task list and finish them before you close the page.' }));
+      return;
+    }
+    if (!CFG.submit_url || PLAT.dry) {
+      card.appendChild(el('p', { text: PLAT.dry ? 'Dry run: answers were not submitted.' :
+        'No submission endpoint is configured, so answers stay in this browser.' }));
+      completion();
+      return;
+    }
+    var status = el('p', { text: 'Sending your answers\u2026' });
+    card.appendChild(status);
+    submit(function (ok, detail) {
+      if (ok) { status.textContent = 'Answers received.'; }
+      else {
+        status.className = 'warn';
+        status.textContent = 'Your answers could not be sent (' + detail + '). ' +
+          'Please download a copy with the button below and send it to the researcher, then use the code.';
+      }
+      completion();
+    });
+  }
+
+  // ---------- export / submission ----------
+  var COLS = ['coder', 'platform', 'participant_id', 'study_id', 'platform_session_id', 'build',
+    'task', 'item_id', 'item_type', 'q1_political', 'q2_national',
+    'q3_status', 'q3_n_quasi', 'q3_split',
+    'q4_relevant', 'q5_economic', 'q5_equal_chances', 'q5_equal_rights', 'q6_position', 'expert_note',
+    'phase', 'is_gold_item'];
+
+  function table() {
+    var rows = [];
+    D.tasks.forEach(function (t) {
+      items(t).forEach(function (it) {
+        var a = peek(t, it);
+        var pre = [S.coder, PLAT.name, PLAT.pid, PLAT.study, PLAT.session, D.built, t.id];
+        var tail = [t.phase || '', t.phase === 'training' || t.phase === 'entry' ? 1 : (t.phase === 'production' ? '' : '')];
+        if (it.kind === 'split') {
+          it.d.sentences.forEach(function (s, si) {
+            var tk = toks(s), cuts = (a.cuts && a.cuts[si]) || [], st = lineState(a, si);
+            var marked = tk.map(function (w, j) { return (cuts.indexOf(j) >= 0 ? '| ' : '') + w; }).join(' ');
+            var n = st === 'unresolved' ? '' : (st === 'one_qs' ? 1 : cuts.length + 1);
+            rows.push(pre.concat([it.d.id + '-' + s.idx, 'split_sentence', '', '',
+              st, n, st === 'unresolved' ? '' : marked,
+              '', '', '', '', '', si === 0 ? (a.note || '') : ''].concat(tail)));
+          });
+        } else if (it.kind === 'article') {
+          rows.push(pre.concat([it.d.id, it.d.press ? 'press_release' : 'article',
+            it.d.press ? '' : (a.q1 || ''), (it.d.press || a.q1 === 'yes') ? (a.q2 || '') : '',
+            '', '', '', '', '', '', '', '', a.note || ''].concat(tail)));
+        } else {
+          var y = a.q4 === 'yes';
+          rows.push(pre.concat([it.d.id, 'qs', '', '', '', '', '',
+            a.q4 || '', y ? (a.econ ? 1 : 0) : '', y ? (a.chances ? 1 : 0) : '', y ? (a.rights ? 1 : 0) : '',
+            y ? (a.q5 || '') : '', a.note || ''].concat(tail)));
+        }
+      });
+    });
+    return rows;
+  }
+
+  function csvText() {
+    return '\ufeff' + [COLS].concat(table()).map(function (r) {
+      return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\r\n');
+  }
+
+  function filename() {
+    var who = (S.coder || PLAT.pid || 'coder').replace(/[^\w-]+/g, '_');
+    return 'answers_' + who + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  }
+
+  // Tries the real file download and reports whether the browser accepted it. A
+  // sandboxed frame blocks this outright, so the caller always has a fallback.
+  function tryDownload() {
+    var csv = csvText(), name = filename();
+    try {
+      var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      var link = el('a', { href: url, download: name });
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      return true;
+    } catch (e) { /* fall through to the data: URI */ }
+    try {
+      var link2 = el('a', { href: 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv), download: name });
+      document.body.appendChild(link2); link2.click(); link2.remove();
+      return true;
+    } catch (e2) { return false; }
+  }
+
+  function download() {
+    // Where a download cannot be trusted, go straight to the copy-out screen rather
+    // than appearing to succeed.
+    if (FRAMED || !STORAGE_OK) { showAnswers(true); return; }
+    if (!tryDownload()) { showAnswers(true); return; }
+    showDownloaded();
+  }
+
+  function showDownloaded() {
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: 'Answers downloaded' }),
+      el('p', { text: 'Your browser was asked to save ' + filename() + ' \u2014 look in your Downloads ' +
+        'folder, then put the file in the shared Dropbox folder.' }),
+      el('p', { cls: 'how', text: 'No file appeared? Nothing is lost. Click \u201cShow answers as text\u201d ' +
+        'below and copy them out instead.' })]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Back to tasks', onclick: menu }),
+      el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+      el('button', { cls: 'primary', text: 'Download again', onclick: download })]));
+  }
+
+  // Fallback for every browser that refuses a blob download (file:// pages, sandboxed
+  // previews, download-blocking settings): show the CSV and let it be copied out.
+  function showAnswers(becauseBlocked) {
+    var csv = csvText();
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var ta = el('textarea', { cls: 'dump', readonly: 'readonly', spellcheck: 'false' });
+    ta.value = csv;
+    var msg = el('span', { cls: 'msg' });
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: becauseBlocked ? 'This window cannot save a file' : 'Answers as text' }),
+      el('p', { text: becauseBlocked
+        ? 'Your answers are complete and shown below \u2014 nothing is lost. This window cannot ' +
+          'write a file, so copy everything in the box and save it as answers.csv.'
+        : 'Copy everything in the box below and save it as a file called answers.csv.' }),
+      ta,
+      el('div', null, [
+        el('button', { cls: 'primary', text: 'Copy to clipboard', onclick: function () {
+          var ok = false;
+          try { ta.select(); ok = !!(document.execCommand && document.execCommand('copy')); }
+          catch (e) { ok = false; }
+          if (!ok && typeof navigator !== 'undefined' && navigator.clipboard) {
+            try { navigator.clipboard.writeText(csv); ok = true; } catch (e) { ok = false; }
+          }
+          msg.textContent = ok ? 'Copied. Save it as answers.csv'
+            : 'Copy did not work \u2014 click in the box, press Ctrl+A then Ctrl+C.';
+        } }),
+        msg])
+    ]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Back to tasks', onclick: menu }),
+      el('button', { text: 'Try the download again', onclick: download })]));
+  }
+
+  function submit(cb, phase) {
+    var payload = {
+      build: D.built, mode: D.mode, platform: PLAT.name,
+      participant_id: PLAT.pid, study_id: PLAT.study, platform_session_id: PLAT.session,
+      query: PLAT.query, coder: S.coder || '',
+      phase: phase || (CROWD ? 'completed' : 'completed'),
+      task: D.task || D.mode, language: D.language || '', batch: BATCH,
+      pilot: !!D.pilot, feedback: S.feedback || '',
+      entry: CROWD ? (S.entry || null) : null,
+      screeners: CROWD ? scoreScreeners() : null,
+      timings: CROWD ? { training_s: secs(S.t.training, S.t.training_end), entry_s: secs(S.t.entry, S.t.entry_end),
+                         production_s: secs(S.t.production, S.t.production_end) } : null,
+      started_at: S.started, finished_at: new Date().toISOString(),
+      columns: COLS, rows: table(), answers: S.ans
+    };
+    var done = false;
+    function once(ok, detail) { if (!done) { done = true; cb(ok, detail); } }
+    try {
+      var x = new XMLHttpRequest();
+      x.open('POST', CFG.submit_url, true);
+      // text/plain is a CORS 'simple request' (no preflight), which is what a Google Apps Script
+      // web app and most form endpoints accept; the body is still the JSON document.
+      x.setRequestHeader('Content-Type', CFG.submit_content_type || 'text/plain;charset=utf-8');
+      x.timeout = 20000;
+      x.onload = function () { once(x.status >= 200 && x.status < 300, 'status ' + x.status); };
+      x.onerror = function () { once(false, 'network error'); };
+      x.ontimeout = function () { once(false, 'timeout'); };
+      x.send(JSON.stringify(payload));
+    } catch (e) {
+      once(false, 'blocked');
+    }
+  }
+
+  var hguide = document.getElementById('hguide');   // static button in the header template (build_crowd_page.py)
+  if (CROWD && D.guide_html && hguide) { hguide.style.display = ''; hguide.addEventListener('click', guideOverlay); }
+  menu();
+})();
+</script>
+</body>
+</html>
