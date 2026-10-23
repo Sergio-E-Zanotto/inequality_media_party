@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Political articles: national or international?</title>
+<style>
+:root { --bg:#f5f6f8; --card:#fff; --ink:#1d2330; --muted:#667085; --line:#d0d5dd; --accent:#2f5bd3;
+        --accent-soft:#e8eefc; --hl:#fff0a0; --ctx:#8a94a6; --cut:#d92d20; --how:#f2f4f7; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+header { background:#1f2a44; color:#fff; padding:10px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+header .t { font-weight:600; }
+header .p { margin-left:auto; font-size:13px; opacity:.85; }
+.bar { height:4px; background:#e4e7ec; } .bar > div { height:4px; background:var(--accent); width:0; transition:width .2s; }
+main { max-width:900px; margin:0 auto; padding:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; }
+h2 { font-size:17px; margin:0 0 8px; } h3 { font-size:16px; margin:0 0 6px; }
+.part { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:8px; }
+.text { font-size:16px; line-height:1.65; }
+.text.long { max-height:60vh; overflow:auto; padding-right:6px; }
+.text p { margin:0 0 .8em; } .text p:last-child { margin-bottom:0; }
+.ttl { font-weight:700; }
+.ctx { color:var(--ctx); }
+.qs { background:var(--hl); font-weight:600; padding:1px 3px; border-radius:3px; }
+.how { font-size:13px; color:#475467; background:var(--how); border-radius:8px; padding:8px 10px; margin:0 0 10px; white-space:pre-line; }
+.opts { display:flex; flex-wrap:wrap; gap:8px; }
+.opt { border:1px solid var(--line); border-radius:8px; padding:8px 14px; background:#fff; font:inherit; cursor:pointer; text-align:left; }
+.opt:hover { border-color:var(--accent); }
+.opt.on { border-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+.opt small { display:block; font-weight:400; color:var(--muted); font-size:12px; max-width:250px; }
+.stop { font-size:13px; color:var(--muted); font-style:italic; }
+.nav { display:flex; gap:8px; justify-content:space-between; align-items:center; margin-bottom:14px; }
+button { font:inherit; border-radius:8px; border:1px solid var(--line); background:#fff; padding:8px 16px; cursor:pointer; }
+button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+.id { font-size:12px; color:var(--muted); }
+.sent { padding:8px 0; border-top:1px solid #eaecf0; line-height:2; }
+.sent:first-of-type { border-top:0; }
+.sent { user-select:none; -webkit-user-select:none; }
+.w { padding:2px 0; }
+.seg1 { background:#e8f0fe; } .seg2 { background:#fdf0e6; }
+.gap { display:inline-block; width:10px; height:1.6em; vertical-align:middle; cursor:pointer; position:relative; }
+.gap::after { content:''; position:absolute; left:4px; top:2px; bottom:2px; width:0; border-left:2px dotted transparent; }
+.sent:hover .gap::after { border-left-color:#c8ced8; }
+.sent .gap:hover::after { border-left:2px solid var(--cut); }
+.sent .gap.cut { background:none; width:14px; }
+.sent .gap.cut::after { border-left:3px solid var(--cut); left:5px; }
+.cnt { font-size:12px; color:var(--cut); margin-left:6px; }
+.note { width:100%; min-height:40px; font:inherit; font-size:13px; border:1px dashed var(--line); border-radius:8px; padding:6px 8px; background:transparent; }
+.task { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-top:1px solid #eaecf0; flex-wrap:wrap; }
+.tname { font-weight:600; } .tright { display:flex; gap:10px; align-items:center; }
+input[type=text] { font:inherit; padding:7px 10px; border:1px solid var(--line); border-radius:8px; width:200px; }
+.msg { color:var(--cut); font-size:13px; margin-left:8px; }
+
+/* ---- 2026-10-14 patch: splitting gate, wider targets, platform screens ---- */
+.sent { touch-action:manipulation; }
+.gap { width:14px; }
+.sent .gap.cut { width:18px; }
+.sent.todo { background:#fffbea; }
+.nos { font-size:12px; margin-left:10px; padding:2px 10px; border:1px solid var(--line);
+       border-radius:999px; background:#fff; font:inherit; font-size:12px; cursor:pointer;
+       vertical-align:middle; }
+.nos:hover { border-color:var(--accent); }
+.nos.on { border-color:var(--accent); background:var(--accent-soft); font-weight:600; }
+.hint { font-size:13px; color:#475467; margin:0 0 10px; }
+.ctxnone { font-size:13px; color:var(--ctx); font-style:italic; }
+.code { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:20px; letter-spacing:2px;
+        background:var(--how); border:1px solid var(--line); border-radius:6px; padding:4px 12px; }
+a.btn { display:inline-block; font:inherit; text-decoration:none; border-radius:8px;
+        border:1px solid var(--line); background:#fff; padding:8px 16px; cursor:pointer; color:var(--ink); }
+a.btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.warn { color:var(--cut); }
+
+.dump { width:100%; min-height:260px; font-family:ui-monospace,Menlo,Consolas,monospace;
+        font-size:12px; border:1px solid var(--line); border-radius:8px; padding:8px;
+        white-space:pre; overflow:auto; }
+
+.alarm { background:#fde7e5; border:2px solid var(--cut); border-radius:10px; padding:12px 14px;
+         margin-bottom:14px; font-size:14px; line-height:1.45; color:#7a140c; }
+.alarm strong { color:var(--cut); }
+
+.gold { border-color:#2f5bd3; background:#f4f7ff; }
+.gold .ans { font-weight:600; margin:4px 0; }
+ol { padding-left:20px; } li { margin:4px 0; }
+
+/* guidelines card (embedded TRAINING_*.html), overlay and header button */
+.guide h1 { font-size:1.35em; margin:0 0 8px; } .guide h2 { font-size:1.1em; margin-top:26px; color:#333; border-bottom:2px solid #ddd; padding-bottom:4px; }
+.guide .gnum { margin:10px 0 6px; } .guide .gl { margin:0 0 22px; } .guide .ex { margin:8px 0 8px 18px; padding:6px 10px; border-radius:6px; }
+.guide .ex.ok { border-left:5px solid #2e7d32; background:#f3f9f3; } .guide .ex.bad { border-left:5px solid #b71c1c; background:#fbf1f1; }
+.guide .ex .part { font-weight:600; text-transform:none; letter-spacing:0; font-size:13px; } .guide .ex.bad .part { color:#b71c1c; } .guide .ex.ok .part { color:#2e7d32; }
+.guide .ans { font-weight:600; margin:6px 0 0; } .guide .lead { color:#555; }
+.overlay { position:fixed; inset:0; background:rgba(16,24,40,.55); z-index:50; overflow:auto; padding:24px 12px; }
+.overlay-box { max-width:900px; margin:0 auto; } .overlay-box .nav { position:sticky; top:0; background:var(--bg); padding:8px 0; z-index:1; }
+header .hbtn { background:#fff; color:#1f2a44; border:0; border-radius:6px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; }
+</style>
+</head>
+<body>
+<header><span class="t" id="htitle"></span><button class="hbtn" id="hguide" type="button" style="display:none">Guidelines</button><span class="p" id="hprog"></span></header>
+<div class="bar"><div id="hbar"></div></div>
+<main id="app"></main>
+<script id="data" type="application/json">{"built": "20261023101128", "mode": "crowd", "task": "T1_scope", "language": "German", "lang": "de", "title": "Political articles: national or international?", "intro": "You will read short political texts and answer two questions about each: is it about politics, and is it mainly about national or international politics.", "instr": {"q1": {"q": "Q1. Is this article about politics?", "how": "YES = politics is a main theme: government, parliament, parties, politicians acting as politicians, elections, laws and public policy (taxes, welfare, schools, migration, health), political protest. Foreign politics is also yes.\nNO = politics is absent or only mentioned in passing: sport, culture, lifestyle, celebrity and human-interest stories, business news without a policy angle, accidents or crime. A politician appearing as a private person or as a celebrity does not make an article political.\nJudge the whole article, not one sentence."}, "q3": {"q": "Q3. Where does a new quasi-sentence begin?", "how": "Every line on the screen is one sentence. Decide whether it contains one unit of meaning or several, and mark where each new unit begins.\nA quasi-sentence is one unit of meaning: one statement, demand, measure, judgement or fact. A sentence can contain one or several; a quasi-sentence never runs across two sentences. Boundaries usually fall at a semicolon, at a comma, or at “and” / “but” — but you decide where one unit ends and the next begins.\nTo mark a boundary, click the space between two words: a red line appears and the new quasi-sentence is shaded. Click the red line again to remove it. If the whole sentence is one unit of meaning, press “one quasi-sentence”."}, "q4": {"q": "Q4. Does the highlighted statement refer to equality, social justice or the equal treatment of all people?", "how": "Code the highlighted statement (one quasi-sentence) only; the grey text before and after is context.\nYES = the statement refers to economic equality, equal chances or equal rights (the three kinds in Q5), whatever its position: in favour, against, or merely reporting.\nNO = no such reference. Examples of NO: equality before the law, fair application of the rule of law, physical integrity, immigration or asylum as such, crime, as well as names, job titles and datelines."}, "q5": {"q": "Q5. Which kind of equality? Choose ONE category.", "how": "If more than one category applies, decide which ONE is most clearly emphasized.", "opts": [{"key": "econ", "name": "Economic equality", "desc": "Statements mentioning financial and economic equality. Examples: ordinary citizens are doing poorly; economic inequality is on the rise; redistribute from the top to the bottom; the rich should bear a larger burden; society is drifting apart; narrow the gap between rich and poor; wealth tax; share the benefits of globalization fairly; mobility, energy, housing and health care must be affordable for all."}, {"key": "chances", "name": "Equal chances / social mobility", "desc": "Statements mentioning equal educational, economic and social opportunities. Examples: good education for all; higher education accessible for low- and middle-income students; a child's social background should not determine its future; everyone must be given a fair chance regardless of their parents' income."}, {"key": "rights", "name": "Equal rights / anti-discrimination", "desc": "Statements mentioning discrimination based on disability, race, colour, religion, sex or gender; LGBTQ rights; equal pay for women (gender pay gap). Examples: we are the party of diversity and inclusion; we want a diverse society; a quota for women on supervisory boards."}]}, "q6": {"q": "Q6. What position does the statement take on equality?", "how": "SUPPORTS = in favour of more equality or against inequality — demands, measures that reduce inequality, criticism of inequality; saying that inequality exists, grows or is a problem also counts.\nAGAINST = argues against more equality or against the measures for it, or presents inequality as acceptable, deserved or necessary.\nMENTIONS = refers to the topic without taking a position (neutral facts, events, agendas).\nReported speech: code the position of the actor who is reported ('Labour calls for a wealth tax' = supports). The position is about equality, not about a party: 'The tax cuts only help the rich' = supports."}}, "q2": {"q": "Q2. Is it mainly about German national politics or international politics?", "how": "NATIONAL = the main political issue sits in the national arena: the federal government, the Bundestag, national parties and their leaders, national laws, elections and policy debates. A foreign event counts as national when the article is about how the German government, parliament or parties respond to it.\nINTERNATIONAL = mainly another country's politics, or international affairs with no domestic focus.\nThe main topic decides, not a single sentence."}, "training": [], "entry": {"items": [{"id": "DE_S01", "press": false, "title": "", "paras": ["Im Grundsatz ist sich der Weltsicherheitsrat einig: Man will einen Aufruf von UN- Generalsekretär Guterres zur weltweiten Waffenruhe unterstützen. An den Details allerdings entzünden sich schwere Konflikte VON CHRISTIAN ZASCHKE New York – Die Sprache der Diplomatie ist eine Sprache der Details, der vermeintlichen Kleinig- und Winzigkeiten. Wenn es um gemeinsame Kommuniqués oder Resolutionen geht, kann es vorkommen, dass die Diplomaten um einzelne Wörter ringen, und zwar stundenlang. Oder, wie aktuell im Sicherheitsrat der Vereinten Nationen, wochenlang. Vermutlich trägt außerhalb der Lyrik nirgends sonst ein einzelnes Wort so eine Bedeutung wie in der Diplomatie.", "Aktuell geht es darum, dass der UN-Sicherheitsrat eine Resolution zur Corona-Krise verabschieden will. Im Grundsatz sind sich die fünf ständigen Mitglieder und die zehn nicht-ständigen Mitglieder einig darüber, dass sie einen Aufruf des UN-Generalsekretärs António Guterres unterstützen wollen. Dieser hat eine weltweite Waffenruhe gefordert, um den Kampf gegen die Pandemie zu erleichtern. Auf den ersten Blick stellt sich die Frage: Wo sollte das Problem sein? Niemand kann ernsthaft etwas gegen einen solchen Aufruf haben.", "Guterres hat diesen Aufruf allerdings bereits am 23. März gemacht, und seither wird am Sitz der UN in New York um Worte und Wörter gerungen. Frankreich und Tunesien hatten die Initiative übernommen und an einem Text für die Resolution gearbeitet. Die Zusammenarbeit mit den anderen Staaten lief zunächst gedeihlich, viele Vorschläge der übrigen Mitglieder wurden eingearbeitet. Zum Beispiel sollte der Aufruf zur Waffenruhe zunächst für 30 Tage gelten.", "Auf Drängen Deutschlands wurde die Frist auf 90 Tage ausgeweitet. Allmählich schälte sich ein Problem heraus. Ein ehemaliger hochrangiger Mitarbeiter der US- Delegation im Sicherheitsrat sagte der SZ: „Aus unserer Sicht war das Problem ganz klar China.“ Das sehen die Chinesen wenig überraschend anders. Konkret ging es darum, ob – und wenn ja, wie – die Weltgesundheitsorganisation (WHO) im Resolutionstext erwähnt wird. China wollte die WHO verankert wissen, die USA waren strikt dagegen.", "Die amerikanische Regierung wirft der WHO Versagen in der Corona-Krise vor und zudem übergroße China-Freundlichkeit. Die Amerikaner sind der Ansicht, dass die WHO mitschuldig daran sei, dass China die Verbreitung des Virus lange habe kleinreden können. Präsident Donald Trump hat daher Anfang April die US-Zahlungen an die WHO aussetzen lassen. Die amerikanische Befürchtung war, dass die Aufnahme der WHO in den Resolutionstext die chinesische Darstellung unterstütze, Peking habe in Sachen Virus angemessen reagiert. „Sie wollten das Gesicht wahren“, sagt der ehemalige Mitarbeiter, „und genau das wollten wir nicht.“ Nach langen Verhandlungen tauchte die WHO schließlich im Text nicht namentlich auf, dafür aber der Hinweis auf „spezialisierte Gesundheitsagenturen“ der UN.", "Alle wussten, dass damit nur die WHO gemeint sein konnte. Zunächst schienen sich die Amerikaner auf diese Formulierung einzulassen, dann aber ließen sie die Resolution vor einer Woche platzen. Besonders die deutsche Delegation unter Führung des UN-Botschafters Christoph Heusgen wollte sich damit nicht abfinden. Heusgen ist bekannt dafür, dass er im Rat ungewöhnlich deutliche Worte findet. Im vergangenen Jahr hat er zum Beispiel die amerikanische Nahostpolitik offen kritisiert.", "„Wir glauben nicht an die Macht des Stärkeren. Für uns ist Völkerrecht kein À-la-carte-Menü\", sagte er damals, was für diplomatische Verhältnisse fast einer Rüge gleichkommt. Nun machte er sich gemeinsam mit der Delegation Estlands daran, einen neuen Text zu gestalten. Dieser neue Text ist wesentlich schlanker, er klammert das Konfliktthema WHO komplett aus und konzentriert sich rein auf das Thema Waffenstillstand. Besonders in Krisenregionen wie Libyen, Syrien, Jemen, der Demokratischen Republik Kongo sowie dem Südsudan sollen die Waffen ruhen.", "Nicht betroffen von dem Aufruf wären militärische Operationen gegen Terrormilizen wie den Islamischen Staat oder al-Qaida. Heusgen sagte im Rat, die Unterstützung des Aufrufs von Guterres müsse „Vorrang vor allen anderen Prioritäten“ haben. Seit Dienstag kursiert der Entwurf unter den Mitgliedsstaaten. Zugleich unternahmen jedoch Frankreich und Tunesien den Versuch, ihren Entwurf zu retten, was die Debatten nicht unbedingt vereinfacht. Die entscheidende Frage wird sein, ob sich China auf den verschlankten Entwurf einlässt.", "Die USA hatten ursprünglich gewollt, dass in dem Text auch Transparenz im Umgang mit dem Ausbruch der Pandemie verlangt wird. Das richtete sich gegen China. Die Amerikaner wären nun wohl bereit, auf diesen Punkt zu verzichten – allerdings nur, wenn China einwilligt, der Resolution ohne auch nur den leisesten Hinweis auf die WHO zuzustimmen. Ob der deutsch-estnische Vorstoß den Durchbruch bringt, ist ungewiss. Einerseits sollte der Entwurf zustimmungsfähig sein.", "Andererseits geht es eben nicht nur um Inhalte. Diese seit nun schon acht Wochen dauernde Debatte im Sicherheitsrat ist längst auch Ausdruck des sich verschärfenden Machtkampfs zwischen China und den USA geworden. Den Aufruf des UN-Generalsekretärs zu einer weltweiten Waffenruhe zu unterstützen, muss Vorrang vor allen anderen Prioritäten haben.“ UN-Botschafter Heusgen Wo sollte das Problem sein? UN-Generalsekretär António Guterres will eine Welt ohne Krieg, wenigstens während Corona wütet."], "gold": {"q2": "international", "q1": "yes"}, "note": "both experts agree on scope (the only international article in the gold)"}, {"id": "DE_S03", "press": false, "title": "", "paras": ["Manches Lob schmerzt die Gelobten. Ganz zufrieden sei er mit dem Gewerkschaftskurs des vergangenen Jahres, verkündete kürzlich der Präsident des Arbeitgeberverbandes. Die vereinbarten Lohnerhöhungen betrügen im Schnitt ganze 1,5 Prozent und bewegten sich damit im Rahmen der Produktivitätssteigerung. Das bedeutet: Für die Arbeitgeber hat das Jahr, was Löhne und Gehälter angeht, nichts gekostet. Da schwingt mit: So soll es auch 2005 weitergehen.", "Das hören die Gewerkschaften gar nicht gern. Klingt es für sie doch so, als seien sie allzu zahm. Einerseits: Die Gewerkschaften haben in schwierigen Zeiten bewiesen, dass sie eben nicht immer nur die Gierschlünde und Blockierer sind, als die sie gern hingestellt werden. Darauf sollten sie stolz sein. In der darbenden Baubranche etwa haben sie von vornherein auf eine Entgeltforderung verzichtet, dennoch quälen sich die Verhandlungen seit Monaten dahin.", "Allein die IG Metall hat seit ihrem Tarifabschluss vor einem Jahr in rund 400 Betrieben meist ganz pragmatisch Abweichungen vom Flächentarif organisiert, um mit Kostensenkungen Entlassungen oder Standortverlagerungen vermeiden zu helfen. Andererseits: Während die Arbeitnehmer in vielen Betrieben zurückstecken mussten, erzielten manche Unternehmen Rekordgewinne. Mitten in der viel beschworenen Krise machten sie Kasse. Mehr als 60 Milliarden Euro werden wohl allein die 30 im Aktienindex Dax verzeichneten Firmen verdienen, doppelt soviel wie ein Jahr zuvor. Börsendienste erwarten 40 Prozent höhere Dividenden.", "Nun sind Gewinne nichts Schlimmes. Sie erinnern aber an einen alten Gedanken: an Umverteilung. Solch ein provokantes Wort macht doch bloß böses Blut? Böses Blut macht aber auch, wenn die Deutsche Bank zugleich gute Profite erzielt und weiter Stellen streicht. Oder wenn Siemens floriert, in Werken desselben Konzerns Beschäftigte aber Verzicht üben müssen.", "Dabei kann es aber nicht um Umverteilung alter gewerkschaftlicher Machart gehen: Mehr Geld für alle, rauf mit dem Flächentarif. Die Situation der Betriebe ist dafür heute viel zu differen- ziert. Ziel sollte vielmehr schlicht sein, dass die Arbeitnehmer genauso an den Gewinnen der Unternehmen beteiligt werden sollen, wie sie heute schon die Folgen von Verlusten mitzutragen haben – indem sie nämlich vernünftigerweise oder notgedrungen für weniger Geld mehr arbeiten. Es geht also um eine Tarifpolitik neuer Art. Sie würde nicht das Ende des Flächentarifs bedeuten, im Gegenteil.", "Verbindlich für alle Betriebe könnten die Tarifparteien ganz transparent Regeln vereinbaren, nach denen sich die differenzierte Entlohnung richtet. Dann könnte sich keine Firma benachteiligt fühlen, kein Betriebsrat wäre mit der Situation überfordert. Dass der Unternehmensgewinn dabei eines der betrieblichen Kriterien sein muss, drängt sich auf. Ein bisschen in diese Richtung gehen Überlegungen des IG-Metall-Vize Berthold Huber. Zweistufige Tarifpolitik hat er dies genannt.", "Gemeint war: niedrige Abschlüsse in der Fläche, her mit mehr Geld in den Betrieben. In seiner eigenen Organisation fand Huber hierfür bislang keine Mehrheit – die Angst vor Verlusten ist größer als die Hoffnung auf Gewinne. Auch die Arbeitgeber lehnten ab, weil sich die Idee so anhörte, als gehe es um eine zweite Verhandlungsrunde in den Unternehmen. Die Metallarbeitgeber haben für die- ses Jahr eine Revision des Tarifab- schlusses gefordert, er sei immer noch zu teuer, klagen sie. Zugleich hat ihr Verbands-Chef erklärt, Einmalzahlungen statt Steigerungen des Tabellenlohns seien angezeigt.", "Die Gewerkschaft sollte dies nicht als Kampfansage werten, sondern zur Offensive nutzen. Dass im Betrieb alle in einem Boot sitzen, muss für schlechte Zeiten wie für gute gelten."], "gold": {"q2": "national", "q1": "yes"}, "note": "both experts agree on scope"}, {"id": "DE_X02", "press": false, "title": "", "paras": ["Prinzessin Diana hält die fünf Jahre alte und völlig aufgelöste Clementine Hambro, ihre jüngste Brautjungfer, auf dem Arm und tröstet sie. Es ist eine private Momentaufnahme bei der Hochzeit von Charles und Diana, die bislang nur der engste Familienkreis kannte, aufgenommen von Lord Patrick Lichfield (1939 bis 2005). Dem Großcousin der Königin, den sie zugleich als ihren Hoffotografen schätzte, war es als einzigem Gast der Trauung am 29. Juli 1981 erlaubt, Fotos zu machen. Mehr als 30 Jahre lang waren die Aufnahmen unter Verschluss, doch Mitte September wird die Sammlung von 14 Schwarzweiß- und Farbaufnahmen nun von einem Auktionshaus in Boston versteigert.", "Die Bilder sind allesamt nach der Vermählung entstanden, kurz bevor die offiziellen Hochzeitsfotos im Thronsaal aufgenommen wurden. Mindestgebot pro Bild: 300 Dollar. Auf mehreren Aufnahmen ist die kleine Clementine Hambro zu sehen, eine Urenkelin von Sir Winston Churchill. Der Grund für ihre Tränen: Kurz zuvor war sie auf der Galerie gestürzt und hatte sich den Kopf gestoßen. Für das Kind war der kleine Fauxpas eine große Katastrophe.", "Lange hatten die Brautjungfern sich auf diesen Tag akribisch vorbereitet - und dann stolperte Clementine in einem entscheidenden Moment über die eigenen Füße. Die Königin hingegen war von dem Malheur auch amüsiert. Zu Clementines Mutter soll sie gesagt haben: \"Clemmie ist in der Bildergalerie hingefallen, aber kein Grund zur Sorge - dort waren genügend Staatschefs, um ihr wieder auf die Füße zu helfen.\" (judo.)"], "gold": {"q1": "no"}, "note": "both experts: not political (coded 20-21 Oct 2026); non-political entry-test item (Q1 must be right)"}], "rule": {"min_scope_correct": 2}}, "batches": [[{"id": "DE_T1_01", "press": false, "title": "Prozess gegen Glaeseker und Schmidt beginnt", "paras": ["vL. HANNOVER, 8. Dezember. An diesem Montag beginnt vor dem Landgericht Hannover ein weiterer Korruptionsprozess, bei dem es um das Umfeld des früheren Bundespräsidenten und niedersächsischen Ministerpräsidenten Wulff geht. Dabei wird dessen früherer Sprecher und engster Berater in Hannover und später in Berlin, Olaf Glaeseker, wegen Bestechlichkeit angeklagt, sein Freund Manfred Schmidt wegen Bestechung.", "Mit dem Prozess gegen Wulff wegen Vorteilsannahme, der möglicherweise in zehn Tagen verkürzt oder vorzeitig beendet wird, ist der Prozess gegen Glaeseker und Schmidt nicht nur wegen der handelnden Personen eng verbunden. Aussagen in dem Glaeseker-Prozess könnten dem Ansehen Wulffs stärker schaden als jene im bereits laufenden Verfahren gegen ihn. Der Sachverhalt, um den es dort geht - drei sogenannte Nord-Süd-Dialoge der beiden Bundesländer Niedersachsen und Baden-Württemberg, die der Eventmanager Schmidt mit einigem finanziellen Gewinn organisierte -, ist nicht Gegenstand des Wulff-Verfahrens. Die Staatsanwaltschaft, in beiden Prozessen sind es dieselben Kläger, hatte die Vorgänge dazu untersucht, in der Frage der Nord-Süd-Dialoge aber nur Anklage gegen Glaeseker und Schmidt, nicht gegen Wulff erhoben. Vorgeworfen wird dem früheren Staatssekretär Glaeseker, er habe in den Jahren 2007 bis 2009 Sponsoren aus der Wirtschaft für die Netzwerk-Treffen in Hannover und Stuttgart gesucht und sich dafür vom Veranstalter Schmidt mehrfach nach Spanien und nach Portugal einladen lassen.", "Glaeseker - er wurde ebenso wie im Wulff-Prozess der mitangeklagte Filmproduzent David Groenewold niemals von den Staatsanwälten zu den Vorwürfen vernommen - hält dem entgegen, zwischen Schmidt und ihm gebe es eine alte und tiefe Freundschaft, bei denen es beiderseitige und ausgeglichene Einladungen gegeben habe. Zudem sei die Sponsorensuche nicht eine - als Teil des Straftatbestandes vorausgesetzte - \"dienstliche Handlung\" gewesen, sondern eine Privathandlung im Landesinteresse. Die Vorsitzende Richterin hat zwanzig Verhandlungstermine bis zunächst April angesetzt. Im Prozess sind mehrere bekannte Zeugen vorgeladen, darunter die Fernsehmoderatorin Sabine Christiansen. Wulff soll im Februar als Zeuge befragt werden.", "Das niedersächsische Kabinett entband Wulff am vergangenen Dienstag von seiner Schweigepflicht und erteilte ihm eine Aussagegenehmigung im Glaeseker-Prozess. Bei polizeilichen Vernehmungen soll Wulff sich von Glaeseker distanziert und behauptet haben, er habe von vielen Vorgängen und Urlauben nichts gewusst. Dem widersprachen andere Beteiligte: Er habe von den Urlauben Glaesekers gewusst und mit ihm in dieser Zeit auch Kontakt gehabt. Wulff hatte Glaeseker im Dezember 2011, wenige Wochen vor seinem Rücktritt vom Amt des Bundespräsidenten, ohne Begründung entlassen, ihn aber zuvor vielfach als seinen siamesischen Zwilling bezeichnet, ohne den nichts gehe. Im Rahmen der langjährigen Zweckfreundschaft hatte Glaeseker als \"Spindoctor\" das Bild Wulffs gewandelt von einem farblosen Oppositionsführer im Niedersächsischen Landtag zu einem \"Liebling aller Schwiegermütter\" und die Trennung Wulffs von seiner ersten Ehefrau durch Zusammenarbeit mit der \"Bild\"-Zeitung publizistisch wohlwollend begleiten lassen.", "Die Freundschaft zwischen Wulff und Glaeseker ist inzwischen, wie es heißt, zerbrochen. (Kommentar Seite 10.)"]}, {"id": "DE_T1_02", "press": false, "title": "Wieder deutlich mehr Kirchentagsbesucher", "paras": ["Nach Angaben der Veranstalter haben sich in Dresden 117 957 Dauerteilnehmer für den Evangelischen Kirchentag angemeldet. Das ist ein deutlicher Zuwachs im Vergleich mit dem Evangelischen Kirchentag in Bremen vor zwei Jahren, als die - für die Veranstalter wichtige - Schwelle von 100 000 Teilnehmern erreicht wurde. 1997 in Leipzig, beim ersten Evangelischen Kirchentag in Ostdeutschland nach der friedlichen Revolution, war die Zahl der Teilnehmer noch hinter den Erwartungen der Veranstalter zurückgeblieben. Das wurde vor allem auf das mäßige Interesse an Religion in den neuen Ländern zurückgeführt, während der Besucherstrom aus dem Westen damals recht konstant blieb. Befürchtungen, dies könnte sich dieses Jahr in Dresden wiederholen, haben sich nicht bestätigt: Unter den Dauerteilnehmern sind allein 26930 aus der lutherischen Landeskirche Sachsens - ein für eine Minderheitskirche erstaunlich hoher Mobilisierungsgrad. 89 Prozent der Kirchentagsbesucher sind evangelisch, acht Prozent katholisch. Mit 60 Prozent sind auch in Dresden wieder die Frauen in der klaren Mehrheit. 38 Prozent der Teilnehmer sind jünger als 30 Jahre.", "Wie gewohnt stellen Einzelteilnehmer, Gruppenteilnehmer und Mitwirkende jeweils etwa ein Drittel der Teilnehmer. Aus den Gemeinden sind allein 527 Bläserchöre mit 6151 Bläsern angereist. Zur Finanzierung des Kirchentagshaushalts von 14,8 Millionen Euro tragen laut Veranstalterangaben Teilnehmerbeiträge und Sponsoren sechs Millionen Euro, der Freistaat Sachsen 5,5 Millionen Euro, die Stadt Dresden zwei Millionen Euro, die Landeskirche eine Million Euro und der Bund 400000 Euro bei. (bin.)"]}, {"id": "DE_T1_03", "press": false, "title": "Hofft auf Obama", "paras": ["Die Hohepriesterin der spanischen Sozialistischen Partei hat für das neue Jahr ein \"historisches Ereignis\" von geradezu \"planetarischer\" Bedeutung vorausgesagt. Leire Pajín, Organisationssekretärin der PSOE, sah bei einem Blick in ihre politische Kristallkugel ein kosmisches Zusammentreffen \"zweier fortschrittlicher Führungskräfte auf beiden Seiten des Atlantiks\": Drüben die fortdauernd wohltuende Präsidentschaft Barack Obamas und hüben die Übernahme der rotierenden EU-Ratspräsidentschaft durch Spanien und dessen Ministerpräsidenten José Luis Rodríguez Zapatero. Der spanische Außenminister Moratinos hielt es dann zum Stichtag am 1. Januar eine Nummer kleiner, indem er versicherte, sein Chef und er würden ihre Aufgaben an der Spitze der Union \"mit Demut und Bescheidenheit\" verrichten. Zum Beweis beteuerte auch Zapatero, dass Madrid nicht daran denke, dem neuen EU-Führungsduo Herman van Rompuy und Catherine Ashton das Rampenlicht streitig zu machen.", "Im Gegenteil: Die Spanier wollen nach dem Inkrafttreten des Lissabonner Vertrags sogleich einen protokollarischen Präzedenzfall schaffen und den ständigen Präsidenten aus Belgien auch ständig präsidieren lassen. Wie sich doch die Zeiten geändert haben, seit der stets auf die Innenpolitik konzentrierte damalige Oppositionsführer sitzen blieb, als auf einer Madrider Militärparade die amerikanische Fahne an ihm vorbeizog. Es folgten nach seinem Wahlsieg 2004 (er hatte 2000 den Vorsitz der Sozialistischen Partei errungen) fünf Jahre der absichtsvollen Nichtzurkenntnisnahme im Weißen Haus, weil der Hausherr George W. Bush dem spanischen Regierungschef den abrupten Abzug der spanischen Soldaten aus dem Irak nicht verzieh. Erst mit Obama kam die erste Einladung.", "Nun hofft der Spanier, der als Gastgeschenk gerade eine Erhöhung des Truppenkontingents in Afghanistan ankündigte, so sehr zu Obamas Liebling zu werden, wie sein Vorgänger Aznar dies bei Bush gewesen war. Der unvermittelte internationale Ehrgeiz des 1960 in Valladolid geborenen Zapatero in seiner zweiten Amtsperiode fällt mit einer schweren Wirtschaftskrise daheim und dem entsprechendem Niedergang seiner Popularität zusammen. Sein Motto für die sechs Monate des EU-Postens, nämlich \"mehr Europa\", ist daher auch eine Flucht nach vorn. Die Themen Abbau der Arbeitslosigkeit (sie beträgt 20 Prozent), Wachstum (noch negativ) und Staatsdefizit (10 Prozent) will er in einen europäischen Rahmen einbetten. Das Gleiche soll für die Nachbereitung von Kopenhagen (Klimawandel), Sicherheitsfragen (Terrorismus, Immigration, Piraterie) gelten.", "Schließlich steht noch ein ganzer Strauß profilierungsfähiger EU-Gipfeltreffen auf der Tagesordnung: mit Obama, Russland, Japan, Marokko, der Mittelmeerunion, Lateinamerika, dem Maghreb. Und sogar auf einem heimischen Feld will der diskrete Büroraucher für alle EU-Gäste sichtbar Führungskraft vorführen: bei der Verschärfung des löchrigen Rauchverbots in Spanien. LEO WIELAND"]}, {"id": "DE_T1_04", "press": false, "title": "Risiko Pilot", "paras": ["Es ist verständlich, dass die Lufthansa den Absturz in Frankreich im ersten Schreck als Folge eines extremen Einzelfalls dargestellt hat, der nichts über die Flugtauglichkeit und Gesundheit ihres übrigen Personals aussagt. Dass der Kopilot den Dienst antrat, obwohl er krankgeschrieben war, ist ein Hinweis darauf, dass da in der Tat jemand am Werke war, der - aus welchen Gründen auch immer - seinen Arbeitgeber und die ihm anvertrauten Menschen in einem Maße hintergangen hat, das in einem verantwortungsvollen Beruf eine seltene Ausnahme sein sollte. Trotzdem ist der Vorfall so schwerwiegend, dass grundsätzlich darüber nachzudenken ist, wie der Flugverkehr vor dem Risiko Pilot besser geschützt werden kann. Wenn 149 Kunden und Mitarbeiter ums Leben kommen, muss das betroffene Unternehmen, aber auch der Gesetzgeber jedes Verfahren überprüfen und in Frage stellen. Dass die deutschen Fluggesellschaften nun vereinbart haben, dass künftig kein Pilot mehr allein im Cockpit bleiben darf, ist ein erster Schritt in die richtige Richtung.", "In einem Szenario, wie es sich vermutlich auf dem Germanwings-Flug abgespielt hat, könnte eine Flugbegleiterin immerhin noch die Tür für den ausgeschlossenen Piloten öffnen oder vielleicht durch ihre bloße Anwesenheit das Schlimmste verhindern. Der andere Schluss, den die bisher bekannten Umstände nahelegen, lautet, dass die Fluglinien sich besser um die mentale Stabilität ihres Personals kümmern müssen. Wenn ein Pilot über längere Zeiträume psychische Probleme hat, dann sollte ein Facharzt durchaus in der Lage sein, das zu erkennen. Auf Hinweise der Arbeitskollegen kann man da nicht vertrauen, denn dafür sind sie nicht geschult. Gegen solche Maßnahmen wird oft eingewandt, dass es keine hundertprozentige Sicherheit geben könne.", "Auch der Vorstandsvorsitzende der Lufthansa hat so argumentiert. Das ist richtig, trifft aber nicht den Kern der Sache. Eine Fluggesellschaft unterlässt ja auch nicht das Warten ihrer Turbinen, weil stets die Gefahr des Vogelschlags besteht. In der Flugsicherheit geht es darum, erkannte Risiken so weit wie möglich zu verringern. Auf dieser langen Liste steht nun auch der Selbst- und Massenmörder im Cockpit.", "Jede Vorkehrung, die nur einen von seiner Tat abhält, rettet viele Menschenleben."]}, {"id": "DE_T1_05", "press": false, "title": "Bild, Kurz, Lexikon", "paras": ["Vertrauen ist gut, Kontrolle ist besser – die Weisheit wird häufig Lenin zugeschrieben. Der Satz findet sich in keiner Quelle, aber er entspricht wohl den Überzeugungen Lenins. Vertraue, aber prüfe nach, soll er oft gesagt haben. Wer als Politiker zu sehr auf Vertrauen setzen muss, hat keine Kontrolle mehr – das zeigt das Beispiel Angela Merkels, deren Kandidat Kauder in der Unionsfraktion durchfiel. Verschiedentlich wird ihr empfohlen, im Bundestag nun die Vertrauensfrage zu stellen.", "Die Frage ist in parlamentarischen Demokratien ein dem Regierungschef vorbehaltenes Mittel, um seine Koalition auf Linie zu zwingen und so Handlungsfähigkeit zu demonstrieren. Nach Artikel 68 des Grundgesetzes kann der Bundespräsident, verfehlt der Kanzler die Mehrheit, auf dessen Vorschlag binnen 21 Tagen den Bundestag auflösen; dieses Recht erlischt, sobald das Parlament einen anderen Kanzler wählt. Die Kanzler Brandt, Kohl und Schröder nutzten 1972, 1982 und 2005 die Vertrauensfrage, um auf verfassungsrechtlich fragwürdige Weise durch bewusst herbeigeführte Niederlagen Neuwahlen zu erzwingen. Das lohnte sich für Brandt und Kohl, für Schröder nicht. Merkel will die Vertrauensfrage nicht stellen; sie scheint nicht überzeugt zu sein, die Kontrolle zu haben.", "Neuwahlen will sie auch nicht."]}, {"id": "DE_T1_06", "press": false, "title": "Wenn das Schule macht", "paras": ["An der Tafel steht in Schreibschrift: „I love communism – ich liebe den Kommunismus.“ Gleichzeitig wird im Off die akute Bedrohung erläutert, der österreichische Schüler Tag für Tag ausgesetzt sind: „Viele Lehrer scheuen nicht davor zurück, ihr meist linkes Gedankengut in die Köpfe der Schüler zu verpflanzen.“ Diese Warnung, verbunden mit dem Hinweis, dass Parteiwerbung an Schulen verboten sei und auch „schulfremde Experten“ Parteien nicht „in den Schmutz ziehen“ dürften, finden sich auf der neuen Webseite www.parteifreie-schule.at. Indoktrination, Manipulation und Kommunistenliebe – alles das kann neuerdings per Formular samt Beweismaterial hochgeladen und gemeldet werden. Ein Schelm, wer Böses denkt, wenn er liest, wohin Schüler oder Lehrer Agitprop-Vorfälle in Zukunft melden sollen: direkt an die FPÖ. Die ist nun zwar eindeutig eine Partei; sie will die Fälle, die ihr bekannt werden, aber von unabhängiger Seite prüfen lassen. Den konkreten Anlass, der die Aktion „parteifreie Schule“ ausgelöst hat, den hat die FPÖ in Oberösterreich indes gleich selbst geliefert.", "Der Direktor eines Linzer Gymnasiums hatte unlängst einen Vortrag über Extremismus abbrechen lassen, nachdem der Elternvertreter und FPÖ-Parlamentsabgeordnete Roman Haider im Direktorat angerufen und, dem Vernehmen nach unterlegt mit Drohungen gegen den zuständigen Lehrer, eine Intervention des Rektors erzwungen hatte. Er war zuvor von seinem Sohn aus dem Unterricht heraus alarmiert und mit Handyfotos versorgt worden. Haiders Vorwurf: In dem Vortrag werde die FPÖ mit Rechtsextremismus in Verbindung gebracht. Der Redner, ein Welser Grünen-Politiker, sei „Pseudo-Experte und Linksextremist“. Mit der SZ wollte Haider nicht sprechen, er schickte aber Material: parlamentarische Anfragen zu politischen Aktivitäten in Schulen und zu der Frage, wie viel Schüler für Vorträge zahlen müssten.", "Thomas Rammerstorfer, im Hauptberuf in der Altenpflege tätig und seit Jahren als Autor und Vortragender in Sachen Extremismus unterwegs, kann Auskunft geben: Er bekam 170 Euro. Die Folien zu seinem Vortrag kann man nachlesen. Die FPÖ kommt einmal vor – im Zusammenhang mit ihrer intensiven Verquickung mit schlagenden, oft rechtsextremen Verbindungen. Als er auf Druck der FPÖ gestoppt wurde, diskutierte die Klasse gerade über Scientology. Rammerstorfer, der auch in KPÖ-Broschüren publiziert, wird seither in Linz persönlich bedroht.", "Als Angestellter des FPÖ-dominierten Magistrats in Wels ist er nun auch beruflichem Druck ausgesetzt. Noch beweist er Humor: Derzeit gebe er „zehn Prozent Rabatt auf abgebrochene Vorträge“. Eine Untersuchung habe keine Verfehlung des Redners oder des Lehrers ergeben, sagt Landesschulratspräsident Fritz Enzenhofer. Er habe Haider, dem erregten Vater und Politiker, angeboten, selbst vor der Klasse zu reden, aber der habe abgelehnt. Enzenhofer hält das Ganze für eine „Inszenierung“, um Druck auf Schulbehörden auszuüben.", "Natürlich müsse eine Schule abwägen, wo Staatsbürgerkunde aufhöre und Parteipolitik anfange. Solange aber Sozialkunde in Österreich immer noch Teil des Geschichtsunterrichts sei, gebe es eher zu wenig politische Bildung an den Schulen."]}, {"id": "DE_T1_07", "press": false, "title": "Bild, Prozessbericht, Überblick", "paras": ["Europa und der Datenschutz Eigentlich war es schon lange klar: US- Geheimdienste greifen auf Massen von Internetdaten zu, deshalb können Daten in den USA nicht sicher sein. Nun hat dies auch der Europäische Gerichtshof festgestellt. Das Urteil trifft Facebook und andere Unternehmen, die vom Wissen über ihre Kunden profitieren. Werden sie den Datenschutz jetzt ernst nehmen? Ende einer Legende Die Vereinbarung zwischen EU und Amerika zum Datenschutz war von Anfang an mangelhaft.", "Nun müssen Europas Behörden entscheiden, wie streng sie das Urteil umsetzen Natürlich mussten ein paar Superlative her, um die historische Dimension des Luxemburger Facebook-Urteils begreifbar zu machen. Es sei ein „starkes Signal“, ein „Paukenschlag“, ein „Meilenstein für den Datenschutz“, war nach der Verkündung des Urteils zu lesen. Aber anders als im sonst üblichen Wettbewerb um die lauteste Vokabel war nichts davon übertrieben. Man muss sich das einmal vor Augen halten: Der globale Datenfluss bildet das Adernsystem der digitalen Wirtschaft, der Schutz persönlicher Informationen gilt da eher als Sand im ökonomischen Getriebe und noch dazu als Sicherheitsrisiko, falls man den nimmermüden Sammlern in den US-Geheimdiensten glauben mag. Die Zeichen deuten also eher auf Erosion – und just in dieser Situation spricht der Europäische Gerichtshof (EuGH) ein Machtwort.", "Es lautet: Der europäische Datenschutz ist ein starkes Grundrecht, das sogar über den Atlantik hinausreicht. Der Datenfluss gen USA ist an EU-Standards gebunden, das Grundrecht bleibt nicht irgendwo im Glasfaserkabel hängen. Das Verfahren hat das Zeug zu einer echten Heldengeschichte. Dem findigen Wiener Jurastudenten Max Schrems gelingt es, von Facebook eine endlose Liste seiner dort gespeicherten Daten zu erhalten. Und weil Facebook, wie man durch Edward Snowdens Enthüllungen gelernt hat, ein Selbstbedienungsladen für den datenhungrigen US- Geheimdienst NSA ist, klagt er sich bis zum EuGH durch.", "Und zwar – Glück für ihn – in einer Phase, in der sich der EuGH als europäisches Grundrechtegericht zu positionieren beginnt; das Gericht hat die Vorratsdatenrichtlinie gekippt und Google („Recht auf Vergessenwerden“) in die Schranken gewiesen. Dass der EuGH vor einer personellen Zäsur steht – Präsident Vassilios Skouris räumt an diesem Mittwoch nach zwölf Jahren seinen Schreibtisch –, mag die Bereitschaft für ein geschichtsträchtiges Urteil begünstigt haben. Jedenfalls, so ist zu hören, standen die Richter mit großer Mehrheit hinter dem Spruch; nur einer von fünfzehn soll dagegen gestimmt haben. Die Grundaussage des Urteils ist klar. Der Gerichtshof hat das sogenannte Safe-Harbor- Abkommen zum „angemessenen Schutzniveau“ in den USA für ungültig erklärt.", "Das war im Grunde wenig verwunderlich, denn Safe Harbor war, rechtsstaatlich gesehen, schon immer ein merkwürdiges Konstrukt. Damit wurde unterstellt, europäische Daten landeten bei ihrem Transfer in die USA in einem „sicheren Hafen“ – allerdings ohne hinreichende Kontrolle durch US-Behörden und auf der Grundlage einer „Selbstzertifizierung“ der beitretenden Unternehmen, die sich damit gleichsam selbst den datenschutzrechtlichen Persilschein ausstellten. Die Pointe des Urteils: Laut EuGH ergibt sich nicht einmal aus der Safe-Harbor-Erklärung selbst, welche die EU-Kommission im Jahr 2000 abgegeben hat, dass die Daten in den USA hinreichend geschützt seien – die Geschichte vom sicheren Hafen war schon immer eine Legende. Die Erklärung enthalte „keine hinreichenden Feststellungen“ zu den Maßnahmen, mit denen die USA ein „angemessenes Schutzniveau“ gewährleisten wollten. Ganz im Gegenteil, die Kommission selbst habe erklärt, dass nach US-Recht im Zweifel der Datenschutz hinter der nationalen Sicherheit zurückstehen müsse.", "Anders ausgedrückt: Der Datenschutz stand unter dem Vorbehalt eines Zugriffs der NSA, etwa im Zuge des Programms Prism, mit dem massenhaft Internetdaten erfasst werden. „Das ist eine späte Genugtuung für Edward Snowden“, sagt der Hamburger Datenschutzbeauftragte Johannes Caspar. Der Datenschützer, zuständig auch für Facebook Deutschland, wird sich am Donnerstag in Brüssel mit seinen europäischen Kollegen und am Freitag in Hannover mit den deutschen Datenschützern treffen, um über die Konsequenzen aus dem Urteil zu beraten. Denn mit dem Urteil kommt den Datenschützern eine Schlüsselrolle zu. Sie wollen sich auf ein gemeinsames Vorgehen verständigen, auch, weil einzelne Behörden im Konflikt mit den Konzernen womöglich überfordert sind; das Hamburger Landesamt verfügt über gerade mal 16Mitarbeiter.", "Zwei Optionen sind denkbar: entweder eine Übergangsfrist für die rund 4400 Unternehmen, die im Safe-Harbor-Abkommen aufgelistet sind, oder, der schlimmste Fall für die Wirtschaft, der sofortige Stopp des Datenflusses. Das müssen nun Europas Datenschützer entscheiden. Zwar haben sich die Unternehmensjuristen bereits auf die Suche nach Auswegen begeben. Denkbar sind etwa sogenannte Standardvertragsklauseln oder auch konzerninterne Datenschutzgarantien; auch über eine ausdrückliche Einwilligung der Nutzer zum Datentransfer in den unsicheren Hafen wird nachgedacht. Ob das angesichts der Grundsatzkritik des EuGH am US-Datenschutz reichen wird, ist allerdings fraglich: „Nach diesem Urteil wird es ganz schwer, den Datenfluss in die USA über andere Instrumente aufrechtzuerhalten“, sagt Caspar.", "Ähnlich sieht es Tobias Neufeld von der Anwaltskanzlei Allen & Overy: „Das Prism-Problem bekommen wir dadurch nicht gelöst.“ Bleiben die laufenden politischen Verhandlungen zwischen EU und USA über ein neues Schutzabkommen. Und dort liegen künftig nicht nur die Wirtschaftsinteressen auf dem Tisch, sondern auch die EU-Grundrechtecharta. Der EuGH hat hier ein paar Brandmauern eingezogen. Erstens: Das Datenschutzniveau in den USA muss jenem in der EU „gleichwertig“ sein – und nicht nur „angemessen“, wie die bisherige, eher wachsweiche Formulierung lautete. Zweitens: Wer der NSA eine Hintertür öffnet, rührt an den Kern des Datenschutzes.", "Eine Regelung, die den US-Behörden den generellen Zugriff auf den Inhalt elektronischer Kommunikation gestatte, verletze den „Wesensgehalt“ des Grundrechts auf Achtung des Privatlebens. Und drittens: Das oberste EU-Gericht behält sich eine „strikte Kontrolle“ vor. Dieser letzte Punkt dürfte zu den wichtigsten Aussagen des Urteils gehören. Der „Wertungsspielraum“ der Kommission sei „eingeschränkt“ – was nichts anderes bedeutet, als dass die Zeit für faule Kompromisse vorbei ist. Die Richter in Luxemburg wollen sich den Datenschutz nicht mehr aus den Händen nehmen lassen.", "Bisher konnten sich die Unternehmen selbst einen Persilschein ausstellen Die Richter behalten sich eine „strikte Kontrolle“ der Umsetzung vor Er hat eine Entscheidung des Europäischen Gerichtshofs erstritten: der Wiener Jurastudent Max Schrems am Dienstag in Luxemburg."]}, {"id": "DE_T1_08", "press": false, "title": "Bild, Glosse / Satire", "paras": ["(SZ) Wenn man den deutschen Außenminister mit einem Tier vergleichen wollte – was man übrigens unterlassen sollte, denn Tiervergleiche gelten als unstatthaft –, dann müsste es die Eule sein. Nicht die ganz normale Eule mit ihrem feinen Schuhu-Ruf zu Zeiten, wenn alles schläft und über deutschen Flughäfen das Nachtflugverbot hängt. Nein, die Eule der Minerva wäre als Referenzeule für den Minister angemessen. Allerdings käme für Heiko Maas einzig die Hegel’sche Eule der Minerva infrage, jene also, die erst in der Dämmerung ihren Flug beginnt, zu einem Zeitpunkt, da alle geschichtlichen Ereignisse bereits geschehen sind. Maas hat nämlich am Wochenende schon wieder einen Flug verpasst, weil eine Hilfsturbine zu wenig Druckluft zum Starten auf der Pfanne hatte.", "Deshalb musste von außen Luft reingepustet werden. Was sind das denn bitte für irre Allegorien? Rein statistisch gesehen steht Heiko Maas mit seinen bislang drei Flugverspätungen in diesem Jahr einigermaßen gut da. Ein durchschnittlicher Easyjet-Kunde, der womöglich noch in Tegel starten oder landen muss, ist naturgemäß darauf eingestellt, einen Großteil seines künftigen Lebens unten im Sicherheitsbereich oder oben in der Warteschleife verbringen zu müssen. Aber ein Minister, der mit den besten Maschinen seines Landes unterwegs ist und bei jeder Reise Gefahr läuft, verspätet einzutreffen, muss mit höhnischen Schulterklopfszenarien seiner Kollegen rechnen.", "Kollegen aus Burundi, Nepal und Österreich sind mit ihren lustigen Flugzeugen pünktlich und erholt am Zielort eingetroffen. Nur der deutsche Minister bekommt seine Zeitzonen gewissermaßen von der Flugbereitschaft mitgeliefert. Warum sind die Verspäteten, obwohl man ihrer ungeduldig harrt, nicht gern gesehen? Warum gilt das eigentlich sympathische „Fangt schon mal ohne mich an“ immer noch als Zeichen von Unzuverlässigkeit und weniger als freundliche Absage an die Wichtigtuerei? Wäre Cäsar später zur Senatssitzung gekommen, hätte Brutus ins Leere gestochen.", "Die größte Verachtung für notorisches Zuspätkommen muss die Deutsche Bahn einstecken – und es stimmt natürlich, die traurigen Momente des außerplanmäßigen Halts sind die großen strategischen Niederlagen unseres durchgetakteten Lebens. Aber was würden wir kleinen und großen Rädchendreher schimpfen und blöd aus der Baldessarini-Wäsche gucken, wenn die Bahn plötzlich zu früh käme. Wenn der Zug bereits drei Minuten vor unserer Ankunft mit der wehenden Flagge der vorauseilenden Pünktlichkeit Richtung Frankfurt Flughafen abratterte? Und womit wäre uns und unserem Land gedient, wenn Heiko Maas zu jedem Gipfeltreffen einen Tag früher einträfe als alle anderen? Wir wären isoliert.", "Lassen wir Heiko Maas Zeit; nennen wir seine Art, zu spät zu kommen, diplomatisch und deeskalierend, ja nennen wir sie freundlich „erweiterte Pünktlichkeit“."]}, {"id": "DE_T1_09", "press": true, "title": "", "paras": ["Der Rechtsausschuss des Europaparlaments hat für die umstrittene Reform des europäischen Urheberrechts gestimmt. Joana Cotar, Af D-Bundestagsabgeordnete und stellv. Obfrau im Ausschuss Digitale Agenda, nimmt dazu wie folgt Stellung: „Netz DG und DSGVO sind anscheinend nicht genug, nun sollen auch noch Uploadfilter folgen. Es ist mir völlig unverständlich, wie der Rechtsausschuss des Europaparlaments einer so weitreichenden, freiheitsfeindlichen und undurchdachten Richtlinie zustimmen konnte. Ebenfalls unverständlich ist die Tatsache, dass sich die Gro Ko im Koalitionsvertrag ausdrücklich gegen Uploadfilter ausgesprochen hat, Verhandlungsführer Axel Voss von CDU sich aber auf europäischer Ebene vehement für solche Filter einsetzt.", "Hier werden die deutschen Wähler an der Nase herumgeführt. Die geplanten Uploadfilter bedeuten das Aus für das Internet wie wir es kennen. Algorithmen sind gänzlich ungeeignet, um Urheberrechtsverletzung sinnvoll zu erkennen, Overblocking ist vorprogrammiert. Wie beim Netz DG sind die warnenden Stimmen der Fachleute und Internetpioniere laut, doch die Mehrheit der Abgeordneten ignorierte diese Bedenken, sie stimmte für eine Regelung, die der Zensur Tür und Tor öffnet und für ein Leistungsschutzrecht, das in Deutschland bereits krachend gescheitert ist. Die Einführung auf EU-Ebene entbehrt schlicht jeglicher Logik.", "Die Af D lehnt diesen weiteren Angriff auf die Meinungsfreiheit strikt ab und fordert die Bundesregierung dazu auf, alles dafür zu tun, dass dieses Vorhaben der EU keine Realität wird. Setzen Sie sich wenigstens einmal lautstark FÜR die Freiheit ein, liebe Kollegen der Union und der SPD!“"]}, {"id": "DE_T1_10", "press": true, "title": "", "paras": ["„Die deutsche Entwicklungspolitik hat in Afghanistan ihre Hausaufgaben gemacht. Fortschritte beim Aufbau des Landes sind sichtbar und kommen bei der Bevölkerung an. Dadurch spüren die Menschen, dass es sich für sie lohnt, die afghanische Regierung zu unterstützen und mit der internationalen Staatengemeinschaft zusammenzuarbeiten: Den Verlockungen der Extremisten und Terroristen wird damit der Boden entzogen. Die christlichliberale Koalition ist bereit, sich mit deutscher Entwicklungszusammenarbeit langfristig in Afghanistan zu engagieren. Dies erfordert aber, dass sich auch die Regierung von Afghanistan, angefangen beim Präsidenten, stärker dem langfristigen Gemeinwohl verschreibt und die Korruption und den Drogenanbau bekämpft.", "Tut sie dies nicht oder nur halbherzig, ist der Einsatz deutscher Steuermittel in Afghanistan nicht zu rechtfertigen. Trotz erreichter Erfolge bleiben viele Aufgaben bestehen. Angesichts des geringen Ausgangsniveaus der Entwicklung ist es eine langfristige Aufgabe der afghanischen Regierung und der internationalen Entwicklungszusammenarbeit, in der Breite nachhaltig gute Lebensbedingungen zu erreichen. Deutschland wird daher auch nach der Beendigung der internationalen militärischen Präsenz über die Entwicklungszusammenarbeit in Afghanistan präsent bleiben, sofern die Sicherheitslage dies zulässt.“ Hintergrund: In afghanischen Städten haben eine Million Menschen dank deutscher Hilfe eine bessere Trinkwasserversorgung. 800.000 Menschen haben eine bessere Stromversorgung. Tausende von Haushalten erhalten durch den Aufbau einer Mikrofinanzbank Kredite.", "Tausende Schüler können zusätzlich in Grundschulen gehen. Mehr als 2.000 Auszubildende erhalten eine berufliche Bildung (Quelle: Bundesministerium für wirtschaftliche Zusammenarbeit und Entwicklung)."]}, {"id": "DE_T1_11", "press": true, "title": "", "paras": ["Zur Unterzeichnung des Kooperationsvertrags zwischen dem Goethe-Institut und den großen technischen Universitäten in Deutschland erklären die Sprecherin für Auswärtige Kultur- und Bildungspolitik der SPD-Bundestagsfraktion Ulla Schmidt und die zuständige Berichterstatterin Ulla Burchardt: Die SPD-Bundestagsfraktion begrüßt, dass in Zukunft das Goethe-Institut im Rahmen der Partnerschulinitiative (PASCH) mit den TU9, der Allianz der führenden technischen Universitäten in Deutschland kooperieren wird. Das Goethe-Institut betreut im Rahmen der PASCH-Initiative weltweit Schulen, an denen die Deutsche Sprache vermittelt wird. Durch diese Kooperation wird das Goethe-Institut dazu beitragen, Schülerinnen und Schüler in vielen Ländern auf ein Studium in den so genannten MINT-Fächern in Deutschland vorzubereiten (MINT = Mathematik, Informatik, Naturwissenschaft, Technik). Viele Absolventinnen und Absolventen werden in Deutschland bleiben und mit ihrer hochwertigen Qualifikation einen wichtigen Beitrag auf dem Deutschen Arbeitsmarkt leisten. Absolventinnen und Absolventen, die in ihre Herkunftsländer zurückkehren, sind wichtige Mittler im kulturellen Dialog und können in ärmeren Ländern zur Entwicklung beitragen.", "Die SPD-Bundestagsfraktion fordert, die Partnerschulinitiative weiter auszubauen, auch mit dem Ziel, noch mehr jungen Menschen aus anderen Ländern ein Studium in Deutschland zu ermöglichen – unter anderem in den MINT-Fächern. Dazu fordern wir, Mittel aus dem Sonderprogramm „Bildung und Forschung“ zusätzlich zu investieren. Diese Mittel werden dem Auswärtigen Amt in Höhe von 92 Millionen Euro zur Verfügung gestellt. Sie dürfen nicht zum Stopfen von Haushaltslöchern verwendet werden."]}, {"id": "DE_T1_12", "press": true, "title": "", "paras": ["Zur Bekanntgabe der Details zum Ankaufprogramm der EZB für ABS erklärt Dr. Gerhard Schick, Sprecher für Finanzpolitik: Der von der EZB angekündigte Aufkauf von ABS-Papieren wird keines der Probleme in Europa lösen. Im Gegenteil, erneut könnten Risiken aus dem Bankensektor von der Öffentlichkeit übernommen werden. An der derzeitigen Investitionsschwäche, an den Arbeitslosenquoten in Europa bis zu 25 Prozent und an der anhaltenden Deflationsgefahr wird das ABS-Programm der EZB nichts ändern. Denn es sind nicht Finanzierungsengpässe, die die Unternehmen bei Investitionsentscheidungen zögern lassen, sondern die schwache gesamtwirtschaftliche Nachfrage.", "Nur ein europäisches Investitionsprogramm kann hier Abhilfe schaffen. Der Ankauf von ABS-Papieren ist hingegen aus zweierlei Gründen höchst problematisch: Erstens drohen neue Risiken für die Steuerzahler. Die EZB wird am Markt für die ABS-Papiere allenfalls etwas bewegen können, wenn sie auch Papiere aufkauft, die sonst am Markt keine Abnehmer finden. Sie übernimmt auf diese Weise zwangsläufig Risiken aus den Bankbilanzen, die am Ende entweder bei der EZB verbleiben oder von den Mitgliedstaaten übernommen werden. De facto wird so versucht, Banken zu stabilisieren.", "Bankenrettung ist aber nicht Aufgabe der EZB, schon gar nicht zum Nulltarif. Auch hier sind die Regierungen und die Bankenaufsichten gefordert, die dafür sorgen müssen, dass die Banken ihre Bilanzen in Ordnung bringen und zwar nicht auf Kosten der Allgemeinheit, sondern unter Beteiligung der Eigentümer und gegebenenfalls auch der Gläubiger. Zweitens verfestigt sich das Bild einer Zentralbank, die immer dann einspringt, wenn die Politik nicht handeln will. Der Teufelskreis schwache Nachfrage, schwache Investitionen und hohe Arbeitslosigkeit kann nur von den Regierungen durchbrochen werden. Die Politik muss sich dieser Aufgabe endlich stellen und nicht darauf warten, dass die Zentralbank mit Maßnahmen der Geldpolitik realwirtschaftliche Probleme zu lösen versucht.", "Dies kann nicht gelingen."]}, {"id": "DE_T1_13", "press": true, "title": "", "paras": [". Der Bundesrat hat heute das Gesetz zur Neuregelung der Bestandsdatenauskunft gebilligt. Dazu erklärt die stellvertretende Vorsitzende und innenpolitische Sprecherin der FDP-Bundestagsfraktion Gisela PILTZ: Der Bundesrat hat heute dem Gesetz zur Neuregelung der Bestandsdatenauskunft zugestimmt und so den Weg für ein deutliches Plus an rechtsstaatlichen Hürden bei den Befugnissen der Sicherheitsbehörden frei gemacht. Das vom Bundesverfassungsgericht für verfassungswidrig erklärte Gesetz, das von Rot-Grün eingeführt worden war, wurde durch die Neuregelung mit rechtsstaatlichen Hürden wie Benachrichtigungspflichten und Richtervorbehalt versehen. Die Abfragebefugnis richtet sich nur auf Bestandsdaten, nicht auf Verkehrsdaten und erst recht nicht auf Inhaltsdaten von Telekommunikation.", "Es geht etwa um Daten wie den Inhaber einer Telefonnummer oder auch einer IP-Adresse zu einem bestimmten Zeitpunkt. Eine Speicherverpflichtung der Provider ist mit dem Gesetz nicht verbunden. Das Gesetz regelt zudem nur die Abfrage in konkreten Einzelfällen, keine Massenabfragen. Ein Zugriff der Sicherheitsbehörden auf Daten zum Surfverhalten oder gar auf E-Mail-Inhalte ist mit dem Gesetz nicht verbunden. Anders als zu rotgrünen Zeiten sind nun die Befugnisse der Sicherheitsbehörden mit strikten rechtsstaatlichen Vorgaben versehen.", "Anders als nach der bisherigen Rechtslage dürfen nur noch die im Gesetz explizit genannten Behörden überhaupt auf die Daten zugreifen. Zudem dürfen Zugangssicherungsdaten wie PINs oder PUKs, die bisher nach dem verfassungswidrigen rotgrünen Gesetz ohne besondere Sicherungsmechanismen abgefragt werden durften, nur noch mit Richtervorbehalt abgefragt werden. Zudem müssen die Betroffenen der Abfrage von dynamischen IP-Adressen anders als bisher benachrichtigt werden. Wie schon im bisher geltenden, von Rot-Grün eingeführten Recht ist die Abfrage zu Zwecken der Verfolgung von Straftaten und Ordnungswidrigkeiten sowie zur Gefahrenabwehr möglich. Eine Ausweitung der Befugnisse liegt darin nicht.", "Das Bundesverfassungsgericht hatte diese Zwecke ausdrücklich als verfassungsgemäß anerkannt. Selbstverständlich dürfen die Daten aber nicht willkürlich abgefragt werden, sondern nur dort, wo die Kenntnis eines bestimmten Bestandsdatums es erforderlich ist, um einen Verstoß gegen die Rechtsordnung zu verfolgen. 358-Piltz-Grundrechtsschutz.pdf"]}, {"id": "DE_T1_14", "press": true, "title": "", "paras": ["„Obamas Atom-Gipfel geht am eigentlichen Problem vorbei. Atomwaffen bleiben generell gefährlich, nicht nur, wenn sie in falsche Hände fallen“, kommentiert der stellvertretende Vorsitzende der Fraktion DIE LINKE, Jan van Aken, den Beginn des zweitägigen Atomgipfels in Washington zur Nichtverbreitung und Sicherung von militärischem und zivilem Nuklearmaterial. Van Aken weiter: „Die Atomtechnologie ist immer eine Gefahr, egal wo sie eingesetzt und von wem sie kontrolliert wird. Mit jedem AKW und mit jedem Jahr Laufzeit wächst die Gefahr, dass nukleares Material für Bomben oder Atomwaffen verwendet wird. Die Bedrohung ist real, aber die Antworten in Washington auf diese Bedrohung sind die falschen.", "Auch mit noch so viel Kontrollen und Drohungen wird sich das nukleares Spaltmaterial auf dieser Welt nicht von Militärs und Terroristen fernhalten lassen.Wirkliche Sicherheit bietet nur ein weltweiter Atomausstieg. Dazu gehört eine umfassende atomare Abrüstung in Ost und West, ein sofortiger Stopp aller Atomexporte, ein schneller Atomausstieg in Deutschland und zum Beispiel auch ein Aussetzen des Atomdeals zwischen Indien und den USA. Obama ist unglaubwürdig, wenn er einerseits vor den atomaren Gefahren warnt, andererseits aber Indien indirekt bei der atomaren Aufrüstung unterstützt.Nichtweiterverbreitung und Abrüstung von Atomwaffen sind wichtige Ziele. Auf der Konferenz zum Atomwaffensperrvertrag im Mai in New York kann Obama zeigen, wie wichtig sie ihm sind.“"]}, {"id": "DE_T1_15", "press": true, "title": "", "paras": ["Wie der parlamentarische Staatssekretär im Innenministerium, Stephan Mayer (CSU), bekannt gab, soll es eine Erschwerniszulage für Bundespolizisten geben, die Abschiebeflüge begleiten. Der Af D-Bundestagsabgeordnete und Mitglied des Innenausschusses, Lars Herrmann, zeigt sich darüber erfreut: „Da ich als Bundespolizist selbst lange Zeit mit der Abschiebung vor allem nordafrikanischer Flüchtlinge befasst war, kenne ich die tatsächliche Situation sehr gut und hatte diesen Vorschlag bereits vor über einem Jahr gemacht. Damals hatte ich im Innenausschuss gegenüber Innenminister Seehofer genau das gefordert, was das Innenministerium nun umsetzt. Seehofer schloss seinerzeit eine solche Zulage noch aus. Lapidar meinte er, dass man nicht für alles eine Zulage zahlen könne.", "Der dienstliche Alltag von den sogenannten ‚Personenbegleitern Luft‘ ist jedoch alles andere als leicht. Neben Widerstandshandlungen – vor allem bei Schüblingen aus afrikanischen Ländern – müssen die Beamten nicht nur körperlich fit sein, sondern auch seelische Stabilität vorweisen. Umso erfreulicher ist es, dass die Bundesregierung nun eine Forderung der Af D übernimmt. Ich hoffe, dass das entsprechende Gesetz zur Modernisierung der Beamtenbesoldung bald vorgelegt wird. Als Af D ist es uns egal, wer ‚sein‘ Gesetz durchbekommt.", "Wichtig ist, dass sich in der Sache etwas zum Positiven verändert. Ich freue mich, mit meinem Vorschlag etwas für meine Kollegen bewegt zu haben. Af D wirkt!“"]}, {"id": "DE_T1_16", "press": true, "title": "", "paras": ["„Auch im 66. Jahr nach Verabschiedung der Allgemeinen Erklärung der Menschenrechte ist der Weg zu ihrer weltweiten Umsetzung noch weit. Vor allem durch die aktuellen Krisen im Nahen Osten und in der Ostukraine haben die Menschenrechtsverletzungen ein Ausmaß angenommen, das wir längst überwunden geglaubt hatten.So kosteten der Bürgerkrieg in Syrien und der Krieg gegen das Terrornetzwerk des sogenannten Islamischen Staates allein im zurückliegenden Monat mehr als 5.000 Menschenleben. Der syrischen Beobachtungsstelle für Menschenrechte zufolge waren mehr als 4.000 Tote in Syrien zu beklagen. Im Irak verloren allein im Monat November 1.000 Menschen ihr Leben.Auch die Meldungen aus der Ostukraine über den Tod Tausender erschrecken uns zutiefst.", "Immer mehr Menschen fliehen aus der Region. Nach Angaben des UNHCR wurden rund 430.000 innerhalb des Landes vertrieben.Nach der völkerrechtswidrigen Annexion der Krim spüren die Minderheiten dort einen wachsenden Druck aus Moskau. Vor allem die Krimtataren fürchten, erneut zum Verlassen der Heimat gezwungen zu sein. Diese Angst sitzt tief und ist offenbar wohl begründet: So wurde die Ankündigung der Minderheit, am Tag der Menschenrechte gegen die Einschränkung ihrer Rechte auf die Straße gehen zu wollen, mit einer Warnung der russischen Behörden vor illegalen Demonstrationen unterbunden. Wir fordern Russland mit Nachdruck dazu auf, auf der annektieren Halbinsel Krim die Rechte der Minderheiten zu wahren.Der Internationale Tag der Menschenrechte erinnert vor allem an die Bedeutung der Freiheit.", "Die westlichen Demokratien müssen den weltweiten Herausforderungen entschlossen und auf der Basis gemeinsamer Werte einheitlich entgegentreten. Die Wahrung der europäischen Nachkriegsordnung, der Kampf gegen die Expansion des Terrornetzwerks IS, die Linderung der Not der Flüchtlinge in Syrien, im Irak, aber auch in der Ukraine sind das Gebot der Stunde. Nur so können wir den Menschenrechten weltweit Geltung verschaffen.“"]}]], "screeners": [{"id": "DE_S09", "press": true, "title": "", "paras": ["Ein Interview der badenwürttembergischen Wirtschaftsministerin Nicole Hoffmeister-Kraut in der „Wirtschafts Woche“ und ihre Kritik an den Automobilunternehmen belegt exemplarisch, dass die kurzsichtige und ideologische Verkehrs- und Wirtschaftspolitik der Regierung massiv Arbeitsplätze gefährdet. Dirk Spaniel, verkehrspolitischer Sprecher der Af D-Fraktion erklärt dazu: „Die CDU-Politikerin, die selbst aus einer Unternehmerfamilie stammt, befürchtet, dass 50 Prozent aller Arbeitsplätze im produzierenden Bereich gefährdet sind, wenn 2030 jedes zweite verkaufte Auto ein reines E-Auto sein sollte, wie von der Regierung gewünscht. Die Lage kleiner und mittlerer Zulieferer und damit ganzer Regionen sei zum Teil noch ernster als die der global aufgestellten Autohersteller, gibt sie zu Protokoll. Dieselbe Befürchtung äußert die Af D-Fraktion seit sie im Bundestag ist. Ihre Forderung, Hersteller sollten mehr bezahlbare Pkw-Modelle anbieten, ist naiv.", "Die Zellproduktion ist teuer und bislang wird der Löwenanteil aus Asien bezogen. Hier hat es die Politik versäumt, frühzeitig neue Angebote zu machen. Dennoch widerspricht es marktwirtschaftlichen Prinzipien, eine Technologie vorrangig durch Subventionen aus dem Säckel des Steuerzahlers zu fördern. Das Elektroauto ist keine Erfolgsgeschichte. Weltweit gibt es rund eine Milliarde Autos.", "Davon sind sechs Millionen elektrifiziert. Das sind 0,6 Prozent. Weltweit gesehen, ist der Anteil also verschwindend gering, ähnlich wie in Deutschland mit 100 000 Elektroautos auf 47 Millionen Bestandsfahrzeuge. Derzeit wächst die E-Mobilität jährlich um 40 Prozent. Bei den minimalen Prozentzahlen, sind die Zuwächse indes ein Tropfen auf dem heißen Stein.", "In China, wo die meisten Kohlekraftwerke weltweit in Betrieb sind und weiter wachsen, ist dazu der Strommix noch miserabler als in Deutschland (60 Prozent fossile Energie). Die einseitige Propagierung der Elektromobilität wird unserer Schlüsselindustrie nicht helfen. Sinnvoller ist eine Infrastruktur für synthetische Kraftstoffe, um den Verbrennungsmotor CO2-neutral zu betreiben, wie es die Af D-Fraktion im November 2018 (Antrag 19/6007) vorgestellt hatte. Es ist bedauerlich, dass sich alle Fraktionen gegen diesen vernünftigen Beitrag stemmen.“"], "gold": {"q2": "national"}, "note": "both experts: national; attention check only (cannot catch a national default)"}], "screener_every": 15, "pilot": false, "preview_training": false, "guide_html": "<h1>Annotation guidelines: Political articles: national or international? — German</h1>\n<p class=\"lead\">You will read short political texts and answer two questions about each: is it about politics, and is it mainly about national or international politics.</p>\n<h2>1. Definitions</h2><p class=\"gnum\"><b>1.1 Political article:</b> an article in which politics is a main theme: government, parliament, parties, politicians acting as politicians, elections, laws and public policy (taxes, welfare, schools, migration, health), political protest. Foreign politics counts as political.</p><p class=\"gnum\"><b>1.2 National scope:</b> the main political issue sits in the German national arena: the federal government, the Bundestag, national parties and their leaders, national laws, elections and policy debates. A foreign event counts as national when the article is about how the national government, parliament or parties respond to it.</p><p class=\"gnum\"><b>1.3 International scope:</b> the article is mainly about another country&#x27;s politics, or about international affairs with no domestic focus.</p>\n<h2>2. Task description</h2><p>You read one article at a time. For a newspaper article answer Q1 (is it about politics?) and, if yes, Q2 (mainly national or international?). Party press releases are political by definition, so for them only Q2 is asked. Judge the whole article, not a single sentence.</p>\n<h2>3. Guidelines and examples</h2><p class=\"lead\">✓ = correct coding (answer of the research team) · ✗ = wrong coding. All examples were coded identically by both experts.</p><div class=\"gl\"><p class=\"gnum\"><b>3.1</b> Code YES on Q1 when politics is a main theme of the article, not merely mentioned.</p><div class=\"card ex ok\"><div class=\"part\">✓ party press release · national</div><div class=\"text\" lang=\"de\"><p>Impfpflicht Seit Mitte März müssen Mitarbeiterinnen und Mitarbeiter in Pflegeheimen, Krankenhäusern und ähnlichen Einrichtungen nachweisen, dass ihnen ein Vakzin gegen das Coronavirus gespritzt wurde. Beschwerden gegen dieses Gesetz hat das Bundesverfassungsgericht zurückgewiesen. Es hat dabei Aussagen getroffen, die für künftige Pandemien hilfreich sein können Im Zweifel für die Schwachen Das …</p></div><p class=\"how\">Both experts: political and national — a federal law, the Bundesverfassungsgericht and the governing parties are the topic.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.2</b> A politician appearing as a private person or as a celebrity does not make an article political. Human-interest stories without a political actor, institution or policy are NO.</p><div class=\"card ex ok\"><div class=\"part\">✓ political = NO</div><p class=\"ttl\">Hund Flecki ist wieder bei seinen Besitzern</p><div class=\"text\" lang=\"de\"><p>STUTTGART, 2. August. Zwölf Tage streunte der kroatische Mischlingshund Flecki durch die Felder und Wiesen am Südrand der Schwäbischen Alb: Am Freitagabend entdeckte eine Frau aus Blaubeuren dann den scheuen Hund bei sich im Garten. Um 19.30 Uhr ging bei der Sanitäterin der &quot;UNA-Tierrettung&quot; sowie bei den Hundehaltern Lisa Metzler und Sven Hossalla die erlösende Meldung ein. Seit Mittwoch hatte ein Team der …</p></div><p class=\"how\">Not political: a lost dog and its owners; no political actor, institution or policy is the topic — although the article appeared in a newspaper&#x27;s politics pages. [Pending: enters the training only if both expert codings say “not political”.]</p></div><div class=\"card ex bad\"><div class=\"part\">✗ wrong</div><p>Coding the article above as political because a politician or a newspaper politics page is involved.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.3</b> Decide Q2 by the main topic: domestic institutions, parties and laws → NATIONAL; another country&#x27;s politics or international affairs → INTERNATIONAL. A foreign event discussed through the national reaction to it is NATIONAL.</p><div class=\"card ex ok\"><div class=\"part\">✓ party press release · national</div><div class=\"text\" lang=\"de\"><p>Impfpflicht Seit Mitte März müssen Mitarbeiterinnen und Mitarbeiter in Pflegeheimen, Krankenhäusern und ähnlichen Einrichtungen nachweisen, dass ihnen ein Vakzin gegen das Coronavirus gespritzt wurde. Beschwerden gegen dieses Gesetz hat das Bundesverfassungsgericht zurückgewiesen. Es hat dabei Aussagen getroffen, die für künftige Pandemien hilfreich sein können Im Zweifel für die Schwachen Das …</p></div><p class=\"how\">Both experts: political and national — a federal law, the Bundesverfassungsgericht and the governing parties are the topic.</p></div></div><div class=\"gl\"><p class=\"gnum\"><b>3.4</b> One sentence about another country does not make a national article international, and vice versa — the article as a whole decides.</p></div>"}</script>
+<script id="config" type="application/json">{
+  "platform": "cloudresearch",
+  "completion_code": "CCPR5MGW",
+  "screenout_code": "CS6ECPPZ",
+  "submit_url": "https://script.google.com/macros/s/AKfycbwXglSJs6gpk2Q3ACGvM32kLeQuPXNfEPTH5Nu7IIgV8gvyVW6jnmgwmQhV2L5T-oataA/exec",
+  "prolific_return_url": "",
+  "prolific_screenout_url": "",
+  "cloudresearch_return_url": "",
+  "cloudresearch_screenout_url": "",
+  "complete_after": "task",
+  "id_params": {
+    "prolific": [
+      "PROLIFIC_PID",
+      "STUDY_ID",
+      "SESSION_ID"
+    ],
+    "cloudresearch": [
+      "participantId",
+      "projectId",
+      "assignmentId",
+      "workerId"
+    ]
+  }
+}</script>
+<script>
+// app.js v11 — practice phase is hands-on (answer first, then the research team's answer), skipped when a task has no practice items; v10 — guidelines screen (embedded TRAINING_*.html) shown first after the introduction; Guidelines button in the header reopens it.
+(function () {
+
+  var D = JSON.parse(document.getElementById('data').textContent);
+  var CFG = JSON.parse(document.getElementById('config').textContent);
+  var KEY = 'annotation-' + D.mode + '-' + D.built;
+  var GOLD = D.mode === 'gold';
+  var app = document.getElementById('app');
+
+  // ---------- platform context (Prolific / CloudResearch Connect) ----------
+  function params() {
+    var q = {}, s = String(location.search || '').replace(/^\?/, '');
+    if (!s) return q;
+    s.split('&').forEach(function (kv) {
+      if (!kv) return;
+      var i = kv.indexOf('=');
+      var k = i < 0 ? kv : kv.slice(0, i);
+      var v = i < 0 ? '' : kv.slice(i + 1);
+      try { q[decodeURIComponent(k)] = decodeURIComponent(v.replace(/\+/g, ' ')); }
+      catch (e) { q[k] = v; }
+    });
+    return q;
+  }
+  function detect(q) {
+    var names = Object.keys(q), lower = {};
+    names.forEach(function (n) { lower[n.toLowerCase()] = n; });
+    function pick(list) {
+      for (var i = 0; i < list.length; i++) {
+        var hit = lower[list[i].toLowerCase()];
+        if (hit && q[hit]) return hit;
+      }
+      return null;
+    }
+    var plat = { name: 'none', pid: '', study: '', session: '', query: location.search || '' };
+    var pp = pick(CFG.id_params.prolific);
+    var cc = pick(CFG.id_params.cloudresearch);
+    if (pp) plat.name = 'prolific';
+    else if (cc) plat.name = 'cloudresearch';
+    else if (q.platform === 'prolific' || q.platform === 'cloudresearch') plat.name = q.platform;
+    var order = plat.name === 'cloudresearch'
+      ? CFG.id_params.cloudresearch.concat(CFG.id_params.prolific)
+      : CFG.id_params.prolific.concat(CFG.id_params.cloudresearch);
+    var idk = pick(order);
+    if (idk) plat.pid = q[idk];
+    var sk = pick(['STUDY_ID', 'projectId', 'project_id']);
+    if (sk) plat.study = q[sk];
+    var ssk = pick(['SESSION_ID', 'assignmentId', 'assignment_id']);
+    if (ssk) plat.session = q[ssk];
+    plat.dry = q.dry_run === '1' || q.preview === '1';
+    return plat;
+  }
+  var Q = params();
+  var PLAT = detect(Q);
+
+  // ---------- state ----------
+  // Health probe. A sandboxed preview (Dropbox, Drive, an e-mail client) can make
+  // localStorage throw and block downloads; silently swallowing that is how a whole
+  // session gets lost, so it is detected up front and shown on every screen.
+  var STORAGE_OK = (function () {
+    try {
+      var t = '__probe_' + Date.now();
+      localStorage.setItem(t, '1');
+      var ok = localStorage.getItem(t) === '1';
+      localStorage.removeItem(t);
+      return ok;
+    } catch (e) { return false; }
+  })();
+  var FRAMED = (function () { try { return window.top !== window.self; } catch (e) { return true; } })();
+  var SAVE_FAILED = false;
+
+  function load() { try { var v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) { SAVE_FAILED = true; }
+  }
+  var S = load() || { coder: '', ans: {}, started: new Date().toISOString() };
+  if (!S.started) S.started = new Date().toISOString();
+  S.plat = PLAT;
+  save();
+
+  // ---------- older builds (answers from a previous version of this page) ----------
+  var CARRY = ['q1', 'q2', 'q4', 'q5', 'econ', 'chances', 'rights', 'note', 'cuts'];
+  function coded(st) {
+    var n = 0;
+    if (st && st.ans) Object.keys(st.ans).forEach(function (ik) {
+      var a = st.ans[ik];
+      for (var f = 0; f < CARRY.length; f++) if (a[CARRY[f]] !== undefined) { n++; return; }
+    });
+    return n;
+  }
+  // Older slots for this mode, richest first: a build that was merely opened must not
+  // shadow one that was actually coded in.
+  function olderKeys() {
+    var out = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!k || k.indexOf('annotation-' + D.mode + '-') !== 0 || k === KEY) continue;
+        var n = 0;
+        try { n = coded(JSON.parse(localStorage.getItem(k))); } catch (e) {}
+        if (n) out.push({ key: k, n: n, build: k.slice(('annotation-' + D.mode + '-').length) });
+      }
+    } catch (e) {}
+    out.sort(function (x, y) { return y.n - x.n || (x.build < y.build ? 1 : -1); });
+    return out;
+  }
+  function importOlder(k) {
+    var old;
+    try { old = JSON.parse(localStorage.getItem(k)); } catch (e) { return 0; }
+    if (!old || !old.ans) return 0;
+    var n = 0;
+    Object.keys(old.ans).forEach(function (ik) {
+      var from = old.ans[ik], to = S.ans[ik] || (S.ans[ik] = {}), took = false;
+      CARRY.forEach(function (f) {
+        if (from[f] !== undefined && to[f] === undefined) { to[f] = from[f]; took = true; }
+      });
+      if (took) n++;
+    });
+    if (!S.coder && old.coder) S.coder = old.coder;
+    save();
+    return n;
+  }
+
+  // ---------- helpers ----------
+  function el(tag, props, kids) {
+    var n = document.createElement(tag);
+    if (props) Object.keys(props).forEach(function (k) {
+      var v = props[k];
+      if (k === 'text') n.textContent = v;
+      else if (k === 'cls') n.className = v;
+      else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function items(t) {
+    if (t.type === 'crowd') return t.items.map(function (x) { return { kind: x.kind || crowdKind(), d: x }; });
+    if (t.type === 't1') {
+      return t.articles.map(function (a) { return { kind: 'article', d: a }; })
+        .concat(t.splits.map(function (p) { return { kind: 'split', d: p }; }));
+    }
+    return t.items.map(function (q) { return { kind: 'qs', d: q }; });
+  }
+  function lang(t) { if (CROWD) return D.lang || 'en'; return /-DE$/.test(t.id) ? 'de' : 'en'; }
+  function key(t, it) { return t.id + '|' + it.d.id; }
+  function A(t, it) { var k = key(t, it); if (!S.ans[k]) S.ans[k] = {}; return S.ans[k]; }
+  function peek(t, it) { return S.ans[key(t, it)] || {}; }
+  function toks(s) { return s.text.split(/\s+/).filter(Boolean); }
+
+  // a split line is resolved when it carries a cut or was marked as one quasi-sentence
+  function lineState(a, si) {
+    var c = (a.cuts || {})[si] || [];
+    if (c.length) return 'split';
+    if ((a.nosplit || {})[si]) return 'one_qs';
+    return 'unresolved';
+  }
+  function done(t, it) {
+    var a = peek(t, it);
+    if (it.kind === 'article') return it.d.press ? !!a.q2 : (a.q1 === 'no' || (a.q1 === 'yes' && !!a.q2));
+    if (it.kind === 'split') {
+      for (var si = 0; si < it.d.sentences.length; si++) if (lineState(a, si) === 'unresolved') return false;
+      return true;
+    }
+    return a.q4 === 'no' || (a.q4 === 'yes' && !!a.q5 && !!(a.econ || a.chances || a.rights));
+  }
+  function progress(t) {
+    var its = items(t), n = 0;
+    its.forEach(function (it) { if (done(t, it)) n++; });
+    return [n, its.length];
+  }
+  function allDone() {
+    for (var i = 0; i < D.tasks.length; i++) { var p = progress(D.tasks[i]); if (p[0] < p[1]) return false; }
+    return true;
+  }
+
+  function banner() {
+    if (STORAGE_OK && !FRAMED && !SAVE_FAILED) return null;
+    var why = (!STORAGE_OK || SAVE_FAILED)
+      ? 'This browser is NOT saving your answers. '
+      : 'This page is open inside another website, so the download may be blocked. ';
+    return el('div', { cls: 'alarm' }, [
+      el('strong', { text: 'Stop \u2014 do not code in this window. ' }),
+      el('span', { text: why +
+        'Close it, download the file to your computer, and open it from there (double-click it). ' +
+        'The page needs no internet. Opening it from inside Dropbox, Drive or an e-mail preview ' +
+        'does not work.' })]);
+  }
+  function setHead(title, i, n) {
+    document.getElementById('htitle').textContent = title;
+    document.getElementById('hprog').textContent = i == null ? '' : 'Item ' + (i + 1) + ' of ' + n;
+    document.getElementById('hbar').style.width = i == null ? '0' : (100 * (i + 1) / n) + '%';
+  }
+
+
+  // ================= crowd mode: training -> entry test -> production (+ hidden screeners) =================
+  var CROWD = D.mode === 'crowd';
+  function crowdKind() { return D.task === 'T1_scope' ? 'article' : D.task === 'T1_split' ? 'split' : 'qs'; }
+  function hash32(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i);
+    h = ((h & 0xffff) * 16777619 + ((((h >>> 16) * 16777619) & 0xffff) << 16)) >>> 0; } return h >>> 0; }
+  function chooseBatch() {
+    var n = (D.batches || []).length || 1, q = parseInt(Q.batch, 10);
+    if (q >= 1 && q <= n) return q;
+    if (PLAT.pid) return 1 + (hash32(PLAT.pid) % n);
+    return 1;
+  }
+  // one screener after every `every` production items, never two in a row, never as the last item
+  function interleave(prod, scr, every) {
+    var out = [], si = 0;
+    for (var i = 0; i < prod.length; i++) {
+      out.push(prod[i]);
+      if (scr.length && every > 0 && (i + 1) % every === 0 && i < prod.length - 1) { out.push(scr[si % scr.length]); si++; }
+    }
+    return out;
+  }
+  var BATCH = null;
+  if (CROWD) {
+    BATCH = chooseBatch();
+    D.tasks = [
+      { id: 'training', phase: 'training', type: 'crowd', title: 'Practice', items: D.training || [], q2: D.q2 },
+      { id: 'entry', phase: 'entry', type: 'crowd', title: 'Qualification', items: (D.entry && D.entry.items) || [], q2: D.q2 },
+      { id: 'production', phase: 'production', type: 'crowd', title: 'Coding',
+        items: interleave((D.batches || [[]])[BATCH - 1] || [], D.screeners || [], D.screener_every || 15), q2: D.q2 }
+    ];
+    if (!S.t) S.t = {};
+    S.batch = BATCH; save();
+  }
+  function phaseTask(name) { for (var i = 0; i < D.tasks.length; i++) if (D.tasks[i].phase === name) return D.tasks[i]; return null; }
+  function stamp(name) { if (CROWD && !S.t[name]) { S.t[name] = new Date().toISOString(); save(); } }
+  function secs(a, b) { return (a && b) ? Math.round((new Date(b) - new Date(a)) / 1000) : null; }
+
+  // ---- per-item scoring against gold (shared by entry test and screeners) ----
+  function scoreItem(t, it) {
+    var a = peek(t, it), g = it.d.gold || {}, r = { item_id: it.d.id, kind: it.kind };
+    if (it.kind === 'article') {
+      r.q1_correct = (g.q1 === undefined) ? true : a.q1 === g.q1;
+      r.scope_correct = (g.q1 === 'no') ? r.q1_correct : (!!g.q2 && a.q2 === g.q2);
+      r.nonpolitical = g.q1 === 'no';
+      r.pass = r.scope_correct && r.q1_correct;
+    } else if (it.kind === 'split') {
+      var lines = g.lines || [], ok = 0, det = 0, nsplit = 0;
+      r.lines = [];
+      lines.forEach(function (gl, si) {
+        var st = lineState(a, si), cuts = (a.cuts && a.cuts[si]) || [];
+        var statusOk = st === gl.status;
+        var detected = false;
+        if (gl.status === 'split') {
+          nsplit++;
+          detected = st === 'split' && (gl.cuts == null || cuts.some(function (c) { return gl.cuts.indexOf(c) >= 0; }));
+          if (detected) det++;
+        }
+        if (statusOk) ok++;
+        r.lines.push({ si: si, status_correct: statusOk, detected: detected });
+      });
+      r.n_lines = lines.length; r.status_correct = ok; r.n_split_lines = nsplit; r.split_detected = det;
+      r.pass = ok === lines.length && det === nsplit;
+    } else {
+      r.q4_correct = !!g.q4 && a.q4 === g.q4;
+      r.type_hit = g.q4 === 'yes' && a.q4 === 'yes' &&
+        ((g.econ && a.econ) || (g.chances && a.chances) || (g.rights && a.rights)) ? true : false;
+      r.pass = r.q4_correct && (g.q4 === 'no' || r.type_hit);
+    }
+    return r;
+  }
+  function scoreEntry() {
+    var t = phaseTask('entry'), its = items(t), rule = (D.entry && D.entry.rule) || {};
+    var per = its.map(function (it) { return scoreItem(t, it); });
+    var res = { per_item: per, rule: rule };
+    if (D.task === 'T1_scope') {
+      res.scope_correct = per.filter(function (p) { return p.scope_correct; }).length;
+      res.passed = res.scope_correct >= (rule.min_scope_correct || its.length) &&
+        per.every(function (p) { return p.q1_correct; });
+    } else if (D.task === 'T1_split') {
+      res.status_correct = per.reduce(function (s_, p) { return s_ + p.status_correct; }, 0);
+      res.n_lines = per.reduce(function (s_, p) { return s_ + p.n_lines; }, 0);
+      res.split_detected = per.reduce(function (s_, p) { return s_ + p.split_detected; }, 0);
+      res.n_split_lines = per.reduce(function (s_, p) { return s_ + p.n_split_lines; }, 0);
+      res.passed = res.status_correct >= (rule.min_status_correct || res.n_lines) &&
+        res.split_detected >= (rule.min_split_detected || 1);
+    } else {
+      res.q4_correct = per.filter(function (p) { return p.q4_correct; }).length;
+      res.type_hit = per.filter(function (p) { return p.type_hit; }).length;
+      res.passed = res.q4_correct >= (rule.min_q4_correct || its.length) &&
+        res.type_hit >= (rule.min_type_hit || 1);
+    }
+    return res;
+  }
+  function scoreScreeners() {
+    var t = phaseTask('production'); if (!t) return [];
+    return items(t).filter(function (it) { return !!it.d.gold; }).map(function (it) {
+      var r = scoreItem(t, it); return { item_id: r.item_id, passed: !!r.pass, answered: done(t, it) };
+    });
+  }
+
+  // ---- crowd screens ----
+  var PREVIEW = (params().preview === 'training') || !!D.preview_training;
+  function previewEnd() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'End of the preview' }),
+      el('p', { text: 'In the real study the qualification would start here. This preview shows only the instructions and the practice examples.' })]));
+    app.appendChild(el('div', { cls: 'nav' }, [el('button', { text: 'Back to the start', onclick: crowdMenu }), el('button', { cls: 'primary', text: 'See the examples again', onclick: function () { startPhase('training'); } })]));
+  }
+  function crowdMenu() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var where = PLAT.name === 'none' ? 'Opened outside a recruitment platform: nothing you enter is collected.'
+      : 'Opened from ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') +
+        (PLAT.pid ? '.' : ' (no participant id in the link).') + (PLAT.dry ? ' Dry run: nothing will be submitted.' : '');
+    var steps = [
+      D.guide_html ? 'Guidelines: the definitions, the task and examples with the correct and the wrong coding. Please read them first; you can reopen them at any time with the Guidelines button at the top.' : null,
+      (D.training || []).length ? 'Practice (short, not scored): ' + (D.training || []).length + ' example' + ((D.training || []).length === 1 ? '' : 's') + ' you code yourself, each followed by the answer of the research team.' : null,
+      'Qualification: ' + ((D.entry && D.entry.items) || []).length + ' items you code yourself; you continue only if you pass.',
+      'Coding: ' + ((D.batches || [[]])[BATCH - 1] || []).length + ' items. At the end you receive your completion code.'];
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: D.title || 'Annotation task' }),
+      el('p', { text: D.intro || '' }),
+      PREVIEW ? el('p', { cls: 'how', text: 'PREVIEW for the research team: this file shows the instructions and the practice examples exactly as coders will see them. Nothing is recorded or sent.' }) : el('span'),
+      el('ol', null, steps.filter(function (x) { return x; }).map(function (x) { return el('li', { text: x }); })),
+      el('p', { cls: 'how', text: where })]));
+    var label = 'Start', target = 'training';
+    if (S.entry && S.entry.passed) { label = 'Continue coding'; target = 'production'; }
+    else if (S.entry && !S.entry.passed) { label = 'Show result'; target = 'screenout'; }
+    else if (S.t.training_end) { label = 'Continue to qualification'; target = 'entry'; }
+    else if (S.t.training) { label = 'Continue the practice'; target = 'training'; }
+    else if (D.guide_html && !S.t.guide_read) { label = 'Start'; target = 'guide'; }
+    app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: label, onclick: function () {
+      if (target === 'screenout') return screenOut();
+      if (target === 'guide') return showGuide();
+      startPhase(target);
+    } })]));
+  }
+  // ---- guidelines: the first screen after the introduction; reopenable from the header at any time ----
+  function guideNode() { var n = el('div', { cls: 'card guide' }); n.innerHTML = D.guide_html || ''; return n; }
+  function showGuide() {
+    setHead(D.title || 'Annotation task', null); stamp('guide_open');
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    app.appendChild(el('p', { cls: 'how', text: 'Please read the guidelines below. The same text stays available during the whole task: click Guidelines at the top of the page.' }));
+    app.appendChild(guideNode());
+    app.appendChild(el('div', { cls: 'nav' }, [el('button', { text: 'Back', onclick: menu }),
+      el('button', { cls: 'primary', text: 'I have read the guidelines \u2014 continue to the ' + ((D.training || []).length ? 'practice' : 'qualification'), onclick: function () {
+        S.t.guide_read = new Date().toISOString(); save(); startPhase('training'); } })]));
+    window.scrollTo(0, 0);
+  }
+  function guideOverlay() {
+    var ov = el('div', { cls: 'overlay' });
+    var box = el('div', { cls: 'overlay-box' }, [
+      el('div', { cls: 'nav' }, [el('span', { cls: 'ttl', text: 'Guidelines' }), el('button', { cls: 'primary', text: 'Close', onclick: function () { ov.remove(); } })]),
+      guideNode()]);
+    ov.appendChild(box); ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }
+
+  function startPhase(name) {
+    var t = phaseTask(name); stamp(name);
+    if (name === 'training' && !(D.training || []).length) { S.t.training_end = S.t.training_end || new Date().toISOString(); save(); return startPhase('entry'); }   // no practice items: straight to the qualification
+    if (name === 'training') return showTraining(t, 0);
+    start(t);
+  }
+  function goldSummary(it) {
+    var g = it.d.gold || {}, out = [];
+    if (it.kind === 'article') {
+      if (g.q1 !== undefined) out.push('Q1 political: ' + g.q1);
+      if (g.q2) out.push('Q2 scope: ' + g.q2);
+    } else if (it.kind === 'qs') {
+      out.push('Q4 refers to equality: ' + g.q4);
+      if (g.q4 === 'yes') out.push('Q5 kind: ' + ['econ', 'chances', 'rights'].filter(function (k) { return g[k]; })
+        .map(function (k) { return { econ: 'economic equality', chances: 'equal chances', rights: 'equal rights' }[k]; }).join(', '));
+      if (g.q4 === 'yes' && g.q5) out.push('Q6 position: ' + g.q5);
+    } else if (it.kind === 'split') {
+      (g.lines || []).forEach(function (gl, si) {
+        var c = (gl.cuts || []).length;
+        out.push('Line ' + (si + 1) + ': ' + (gl.status === 'split'
+          ? (c + 1) + ' quasi-sentences (the cut' + (c > 1 ? 's are' : ' is') + ' marked in the line above)'
+          : 'one quasi-sentence \u2014 no cut'));
+      });
+    }
+    return out;
+  }
+  function expertCard(t, it) {
+    var g = it.d.gold || {}, kids = [el('h3', { text: 'Answer of the research team' })];
+    if (it.kind === 'split') {
+      (it.d.sentences || []).forEach(function (snt, si) {
+        var gl = (g.lines || [])[si] || {}, tk = toks(snt), cuts = gl.cuts || [], seg = 0;
+        var line = el('div', { cls: 'sent', lang: lang(t) });
+        tk.forEach(function (w, j) {
+          if (j > 0 && cuts.indexOf(j) >= 0) { seg++; line.appendChild(el('span', { cls: 'gap cut' })); }
+          else if (j > 0) line.appendChild(el('span', { cls: 'gap' + (seg ? (seg % 2 ? ' seg1' : ' seg2') : '') }));
+          line.appendChild(el('span', { cls: 'w' + (seg ? (seg % 2 ? ' seg1' : ' seg2') : ''), text: w }));
+        });
+        line.appendChild(el('span', { cls: 'cnt', text: gl.status === 'split' ? ((cuts.length || 1) + 1) + ' quasi-sentences' : 'one quasi-sentence' }));
+        kids.push(line);
+      });
+    }
+    kids = kids.concat(goldSummary(it).map(function (x) { return el('p', { cls: 'ans', text: x }); }))
+      .concat(g.note ? [el('p', { cls: 'how', text: g.note })] : []);
+    return el('div', { cls: 'card gold' }, kids);
+  }
+  function showTraining(t, i) { return show(t, i); }
+  function entryFinish() {
+    S.entry = scoreEntry(); S.t.entry_end = new Date().toISOString(); save();
+    if (S.entry.passed) {
+      app.innerHTML = '';
+      app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'Qualification passed' }),
+        el('p', { text: 'Thank you. The coding task starts now. From here on there are no more examples with answers.' })]));
+      app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: 'Start coding', onclick: function () { startPhase('production'); } })]));
+      return;
+    }
+    screenOut();
+  }
+  function screenOut() {
+    setHead(D.title || 'Annotation task', null);
+    app.innerHTML = '';
+    var card = el('div', { cls: 'card' }, [el('h2', { text: 'Thank you for taking part' }),
+      el('p', { text: 'Based on the qualification items, this study is not a good match, so it ends here. ' +
+        'You will be paid for the time spent on the qualification according to the study description.' })]);
+    app.appendChild(card);
+    var nav = el('div', { cls: 'nav' }, [el('span')]);
+    app.appendChild(nav);
+    function showCode() {
+      var code = CFG.screenout_code || '';
+      card.appendChild(el('p', { text: 'Your code is:' }));
+      card.appendChild(el('p', null, [el('span', { cls: 'code', text: code })]));
+      var url = '';
+      if (PLAT.name === 'prolific') url = CFG.prolific_screenout_url || ('https://app.prolific.com/submissions/complete?cc=' + encodeURIComponent(code));
+      else if (PLAT.name === 'cloudresearch') url = CFG.cloudresearch_screenout_url || '';
+      if (url) nav.appendChild(el('a', { cls: 'btn primary', href: url, text: 'Return to ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') }));
+      else card.appendChild(el('p', { text: 'Copy this code into the platform.' }));
+    }
+    if (!CFG.submit_url || PLAT.dry) { showCode(); return; }
+    submit(function () { showCode(); }, 'screened_out');
+  }
+
+  // ---------- menu ----------
+  function menu() {
+    if (CROWD) return crowdMenu();
+    setHead(GOLD ? 'Gold coding' : 'Annotation demo', null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var msg = el('span', { cls: 'msg' });
+    var name = el('input', { type: 'text', id: 'coder', placeholder: 'Your initials', maxlength: '20' });
+    name.value = S.coder || '';
+    name.addEventListener('input', function () { S.coder = name.value.trim(); msg.textContent = ''; save(); });
+    app.appendChild(el('div', { cls: 'card' }, GOLD ? [
+      el('h2', { text: 'Gold coding: Task 1' }),
+      el('p', { text: 'Only the gold we are still missing: political and national scope of the articles, and the ' +
+        'quasi-sentence splits of the paragraphs. The screens are the ones crowd coders will see.' }),
+      el('p', { text: 'Answers are saved in this browser as you go. When you are done, click Download answers ' +
+        'and put the file in the shared Dropbox folder. If your browser refuses the download, use ' +
+        'Show answers as text and copy them out instead — nothing is lost either way.' }),
+      el('div', null, [el('label', { for: 'coder', text: 'Coder: ' }), name, msg])
+    ] : [
+      el('h2', { text: 'Demo: what crowd coders will see' }),
+      el('p', { text: 'One item per screen, with the question, what to do, the text and the answer buttons. ' +
+        'Coders see only their own language and never the outlet, party or date.' }),
+      el('p', { text: PLAT.name === 'none'
+        ? 'Opened outside a recruitment platform, so nothing you enter here is collected.'
+        : 'Opened from ' + (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') +
+          (PLAT.pid ? ' as participant ' + PLAT.pid : ' (no participant id in the link)') +
+          (PLAT.dry ? ' \u2014 dry run, nothing will be submitted.' : '.') })
+    ]));
+
+    var old = olderKeys();
+    if (old.length) {
+      var note = el('span', { cls: 'msg' });
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('p', { text: 'Answers from an earlier version of this page were found in this browser. ' +
+          'You can carry over the article answers and any splits you already marked; lines you had not ' +
+          'split still need confirming.' }),
+        el('div', null, [
+          el('button', { text: 'Import ' + old[0].n + ' answered item(s) from build ' + old[0].build,
+            onclick: function () {
+            var n = importOlder(old[0].key);
+            note.textContent = n ? ('Imported ' + n + ' item(s).') : 'Nothing to import.';
+            if (n) menu();
+          } }), note])
+      ]));
+    }
+
+    var list = el('div', { cls: 'card' }, [el('h2', { text: 'Tasks' })]);
+    D.tasks.forEach(function (t) {
+      var p = progress(t);
+      list.appendChild(el('div', { cls: 'task' }, [
+        el('div', null, [el('div', { cls: 'tname', text: t.title }), el('div', { cls: 'id', text: t.note })]),
+        el('div', { cls: 'tright' }, [
+          el('span', { cls: 'id', text: p[0] + ' / ' + p[1] + ' done' }),
+          el('button', { cls: 'primary', text: p[0] === 0 ? 'Start' : (p[0] === p[1] ? 'Review' : 'Continue'),
+            onclick: function () {
+              if (GOLD && !S.coder) { msg.textContent = 'Enter your initials first.'; name.focus(); return; }
+              start(t);
+            } })
+        ])
+      ]));
+    });
+    app.appendChild(list);
+    if (GOLD) app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+      el('button', { text: 'Download answers (CSV)', onclick: download })]));
+  }
+
+  function start(t) {
+    var its = items(t);
+    for (var i = 0; i < its.length; i++) if (!done(t, its[i])) return show(t, i);
+    show(t, 0);
+  }
+
+  // ---------- building blocks ----------
+  function qcard(q, how, body) {
+    return el('div', { cls: 'card' }, [el('h3', { text: q }), how ? el('div', { cls: 'how', text: how }) : null, body]);
+  }
+  function radio(a, field, values, labels, onchange) {
+    return el('div', { cls: 'opts' }, values.map(function (v, k) {
+      return el('button', { cls: 'opt' + (a[field] === v ? ' on' : ''), type: 'button', text: labels ? labels[k] : v,
+        onclick: function () { a[field] = v; onchange(); } });
+    }));
+  }
+
+  // ---------- one item per screen ----------
+  function show(t, i) {
+    var its = items(t), it = its[i], a = A(t, it), PRACTICE = t.phase === 'training';
+    setHead(t.title, i, its.length);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    if (PRACTICE) app.appendChild(el('p', { cls: 'how', text: 'Practice example ' + (i + 1) + ' of ' + its.length +
+      ' (not scored). Answer first; the answer of the research team then appears below your answer.' }));
+    var qbox = el('div'), gbox = el('div');
+    var next = el('button', { cls: 'primary', text: i === its.length - 1 ? (PRACTICE ? (PREVIEW ? 'End of the preview' : 'Start the qualification') : 'Finish') : 'Next',
+      onclick: function () {
+        if (!done(t, it)) return;
+        if (i === its.length - 1) finish(t); else show(t, i + 1);
+      } });
+    function refresh() {
+      save();
+      qbox.innerHTML = '';
+      (it.kind === 'article' ? articleQs : it.kind === 'qs' ? qsQs : function () { return []; })(t, it, a, refresh)
+        .forEach(function (n) { if (n) qbox.appendChild(n); });
+      next.disabled = !done(t, it);
+      if (PRACTICE) { gbox.innerHTML = ''; if (done(t, it)) { if (!a.revealed) { a.revealed = new Date().toISOString(); save(); } gbox.appendChild(expertCard(t, it)); } }
+    }
+
+    if (it.kind === 'article') {
+      var body = [];
+      if (it.d.title) body.push(el('p', { cls: 'ttl', text: it.d.title }));
+      it.d.paras.forEach(function (p) { body.push(el('p', { text: p })); });
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('div', { cls: 'part', text: 'Part A \u00b7 Read the article, then answer' }),
+        el('div', { cls: 'text long', lang: lang(t) }, body)]));
+    } else if (it.kind === 'split') {
+      app.appendChild(qcard(D.instr.q3.q, D.instr.q3.how, null));
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('div', { cls: 'part', text: 'Part B \u00b7 One paragraph, one sentence per line' }),
+        el('div', { cls: 'hint', text: 'Every line needs an answer: either mark the splits inside it, or press ' +
+          '\u201cone quasi-sentence\u201d to say it holds just one.' })]
+        .concat(it.d.sentences.map(function (s, si) { return sentence(a, s, si, lang(t), refresh); }))));
+    } else {
+      var ctx = [];
+      if (it.d.prev) ctx.push(el('p', { cls: 'ctx', text: it.d.prev }));
+      ctx.push(el('p', null, [el('span', { cls: 'qs', text: it.d.qs })]));
+      if (it.d.next) ctx.push(el('p', { cls: 'ctx', text: it.d.next }));
+      if (!it.d.prev && !it.d.next) {
+        ctx.push(el('p', { cls: 'ctxnone', text: 'No surrounding sentences are available for this one. ' +
+          'Code it on its own.' }));
+      }
+      app.appendChild(el('div', { cls: 'card' }, [el('div', { cls: 'text', lang: lang(t) }, ctx)]));
+    }
+    app.appendChild(qbox); app.appendChild(gbox);
+
+    var note = el('textarea', { cls: 'note', placeholder: 'Expert note (optional; not part of the crowd version)' });
+    note.value = a.note || '';
+    note.addEventListener('input', function () { a.note = note.value; save(); });
+    if (GOLD) app.appendChild(el('div', { cls: 'card' }, [note]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: i === 0 ? (PRACTICE ? 'Back' : 'Tasks') : 'Back', onclick: function () { if (i === 0) menu(); else show(t, i - 1); } }),
+      el('span', { cls: 'id', text: PRACTICE ? 'Example ' + (i + 1) : 'Item ID ' + it.d.id }),
+      next]));
+    refresh();
+    window.scrollTo(0, 0);
+  }
+
+  function articleQs(t, it, a, refresh) {
+    var out = [];
+    if (it.d.press) {
+      out.push(el('div', { cls: 'card stop', text: 'Press release: political by definition, so Q1 is skipped.' }));
+    } else {
+      out.push(qcard(D.instr.q1.q, D.instr.q1.how, radio(a, 'q1', ['yes', 'no'], null, function () {
+        if (a.q1 === 'no') delete a.q2;
+        refresh();
+      })));
+    }
+    if (it.d.press || a.q1 === 'yes') {
+      out.push(qcard(t.q2.q, t.q2.how, radio(a, 'q2', ['national', 'international'], null, refresh)));
+    } else if (a.q1 === 'no') {
+      out.push(el('div', { cls: 'card stop', text: 'Not political: no further question for this article. Click Next.' }));
+    }
+    return out;
+  }
+
+  function qsQs(t, it, a, refresh) {
+    var out = [qcard(D.instr.q4.q, D.instr.q4.how, radio(a, 'q4', ['yes', 'no'], null, function () {
+      if (a.q4 === 'no') { delete a.q5; delete a.econ; delete a.chances; delete a.rights; }
+      refresh();
+    }))];
+    if (a.q4 === 'yes') {
+      out.push(qcard(D.instr.q5.q, D.instr.q5.how || '', el('div', { cls: 'opts' }, D.instr.q5.opts.map(function (o) {
+        return el('button', { cls: 'opt' + (a[o.key] ? ' on' : ''), type: 'button',
+          onclick: function () { var was = !!a[o.key]; delete a.econ; delete a.chances; delete a.rights; if (!was) a[o.key] = true; refresh(); } },
+          [el('span', { text: (a[o.key] ? '\u25c9 ' : '\u25cb ') + o.name }), el('small', { text: o.desc })]);
+      }))));
+      out.push(qcard(D.instr.q6.q, D.instr.q6.how,
+        radio(a, 'q5', ['supports', 'against', 'mentions'], ['supports', 'against', 'mentions only'], refresh)));
+    } else if (a.q4 === 'no') {
+      out.push(el('div', { cls: 'card stop', text: 'No reference to equality: Q5 and Q6 are skipped. Click Next.' }));
+    }
+    return out;
+  }
+
+  // ---------- the splitting widget ----------
+  function sentence(a, s, si, lg, onchange) {
+    var tk = toks(s);
+    if (!a.cuts) a.cuts = {};
+    if (!a.nosplit) a.nosplit = {};
+    var box = el('div', { cls: 'sent', lang: lg });
+    var last = 0, lastJ = -1;
+
+    function toggle(j) {
+      var now = Date.now();
+      if (j === lastJ && now - last < 400) return;   // only a repeat on the SAME gap is a double-click
+      last = now; lastJ = j;
+      var c = (a.cuts[si] || []).slice(), k = c.indexOf(j);
+      if (k >= 0) c.splice(k, 1); else c.push(j);
+      c.sort(function (x, y) { return x - y; });
+      a.cuts[si] = c;
+      if (c.length) delete a.nosplit[si];            // a split answers the line
+      draw(); onchange();
+    }
+    function one() {
+      if (a.nosplit[si]) delete a.nosplit[si];
+      else { a.nosplit[si] = true; a.cuts[si] = []; }
+      draw(); onchange();
+    }
+    function draw() {
+      var cuts = a.cuts[si] || [], seg = 0, st = lineState(a, si);
+      box.innerHTML = '';
+      box.className = 'sent' + (st === 'unresolved' ? ' todo' : '');
+      function shade() { return seg === 0 ? '' : (seg % 2 ? ' seg1' : ' seg2'); }
+      tk.forEach(function (w, j) {
+        if (j > 0) {
+          var on = cuts.indexOf(j) >= 0;
+          if (on) seg++;
+          box.appendChild(el('span', { cls: 'gap' + (on ? ' cut' : shade()), title: on ? 'Remove this split' : 'Split here',
+            onclick: function () { toggle(j); } }));
+        }
+        box.appendChild(el('span', { cls: 'w' + shade(), text: w }));
+      });
+      // offered only while the line carries no split, so marking it can never discard one
+      if (!cuts.length) {
+        box.appendChild(el('button', { cls: 'nos' + (st === 'one_qs' ? ' on' : ''), type: 'button',
+          text: (st === 'one_qs' ? '\u2611' : '\u2610') + ' one quasi-sentence', onclick: one }));
+      } else {
+        box.appendChild(el('span', { cls: 'cnt', text: (cuts.length + 1) + ' quasi-sentences' }));
+      }
+    }
+    draw();
+    return box;
+  }
+
+  // ---------- finish ----------
+  function pilotFeedback(t) {
+    setHead(t.title, null);
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var box = el('textarea', { cls: 'note', placeholder: 'Optional: anything unclear in the instructions or the examples? Anything that did not work on your screen?' });
+    box.style.minHeight = '120px';
+    app.appendChild(el('div', { cls: 'card' }, [el('h2', { text: 'One last question (pilot)' }),
+      el('p', { text: 'This is a pilot run. Your comments help us fix the instructions before the main study. You can leave the box empty.' }), box]));
+    app.appendChild(el('div', { cls: 'nav' }, [el('span'), el('button', { cls: 'primary', text: 'Send and get my code', onclick: function () {
+      S.feedback = box.value || ''; S.feedback_done = true; save(); finish(t); } })]));
+  }
+  function finish(t) {
+    if (CROWD && t.phase === 'training') { S.t.training_end = new Date().toISOString(); save(); return PREVIEW ? previewEnd() : startPhase('entry'); }
+    if (CROWD && t.phase === 'entry') return entryFinish();
+    if (CROWD && t.phase === 'production' && !S.t.production_end) { S.t.production_end = new Date().toISOString(); save(); }
+    if (CROWD && D.pilot && t.phase === 'production' && !S.feedback_done) return pilotFeedback(t);
+    setHead(t.title, null);
+    app.innerHTML = '';
+    if (GOLD) {
+      app.appendChild(el('div', { cls: 'card' }, [
+        el('h2', { text: 'Task finished' }),
+        el('p', { text: 'Thanks. Click Download answers and put the file in the shared Dropbox folder.' })]));
+      app.appendChild(el('div', { cls: 'nav' }, [
+        el('button', { text: 'Back to tasks', onclick: menu }),
+        el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+        el('button', { cls: 'primary', text: 'Download answers (CSV)', onclick: download })]));
+      return;
+    }
+    var card = el('div', { cls: 'card' }, [el('h2', { text: 'Task finished' })]);
+    app.appendChild(card);
+    var nav = el('div', { cls: 'nav' }, [CROWD ? el('span') : el('button', { text: 'Back to tasks', onclick: menu })]);
+    app.appendChild(nav);
+
+    function completion() {
+      var code = CFG.completion_code || '';
+      card.appendChild(el('p', { text: 'Your completion code is:' }));
+      card.appendChild(el('p', null, [el('span', { cls: 'code', text: code })]));
+      var url = '';
+      if (PLAT.name === 'prolific') {
+        url = CFG.prolific_return_url || ('https://app.prolific.com/submissions/complete?cc=' + encodeURIComponent(code));
+      } else if (PLAT.name === 'cloudresearch') {
+        url = CFG.cloudresearch_return_url || '';
+      }
+      if (url) {
+        card.appendChild(el('p', { text: 'Click the button to register your submission. ' +
+          'If the page does not return, copy the code above into the platform.' }));
+        nav.appendChild(el('a', { cls: 'btn primary', href: url, text: 'Return to ' +
+          (PLAT.name === 'prolific' ? 'Prolific' : 'CloudResearch') }));
+      } else {
+        card.appendChild(el('p', { text: 'Copy this code into the platform to register your submission.' }));
+      }
+      nav.appendChild(el('button', { text: 'Download a copy (CSV)', onclick: download }));
+      nav.appendChild(el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }));
+    }
+
+    // complete_after: 'task' = a code once this task is done (one task per participant,
+    // or a pilot); 'all' = every task in the file must be finished first.
+    if (!CROWD && CFG.complete_after !== 'task' && !allDone()) {
+      card.appendChild(el('p', { text: 'This task is finished, but other tasks are still open. ' +
+        'Go back to the task list and finish them before you close the page.' }));
+      return;
+    }
+    if (!CFG.submit_url || PLAT.dry) {
+      card.appendChild(el('p', { text: PLAT.dry ? 'Dry run: answers were not submitted.' :
+        'No submission endpoint is configured, so answers stay in this browser.' }));
+      completion();
+      return;
+    }
+    var status = el('p', { text: 'Sending your answers\u2026' });
+    card.appendChild(status);
+    submit(function (ok, detail) {
+      if (ok) { status.textContent = 'Answers received.'; }
+      else {
+        status.className = 'warn';
+        status.textContent = 'Your answers could not be sent (' + detail + '). ' +
+          'Please download a copy with the button below and send it to the researcher, then use the code.';
+      }
+      completion();
+    });
+  }
+
+  // ---------- export / submission ----------
+  var COLS = ['coder', 'platform', 'participant_id', 'study_id', 'platform_session_id', 'build',
+    'task', 'item_id', 'item_type', 'q1_political', 'q2_national',
+    'q3_status', 'q3_n_quasi', 'q3_split',
+    'q4_relevant', 'q5_economic', 'q5_equal_chances', 'q5_equal_rights', 'q6_position', 'expert_note',
+    'phase', 'is_gold_item'];
+
+  function table() {
+    var rows = [];
+    D.tasks.forEach(function (t) {
+      items(t).forEach(function (it) {
+        var a = peek(t, it);
+        var pre = [S.coder, PLAT.name, PLAT.pid, PLAT.study, PLAT.session, D.built, t.id];
+        var tail = [t.phase || '', t.phase === 'training' || t.phase === 'entry' ? 1 : (t.phase === 'production' ? '' : '')];
+        if (it.kind === 'split') {
+          it.d.sentences.forEach(function (s, si) {
+            var tk = toks(s), cuts = (a.cuts && a.cuts[si]) || [], st = lineState(a, si);
+            var marked = tk.map(function (w, j) { return (cuts.indexOf(j) >= 0 ? '| ' : '') + w; }).join(' ');
+            var n = st === 'unresolved' ? '' : (st === 'one_qs' ? 1 : cuts.length + 1);
+            rows.push(pre.concat([it.d.id + '-' + s.idx, 'split_sentence', '', '',
+              st, n, st === 'unresolved' ? '' : marked,
+              '', '', '', '', '', si === 0 ? (a.note || '') : ''].concat(tail)));
+          });
+        } else if (it.kind === 'article') {
+          rows.push(pre.concat([it.d.id, it.d.press ? 'press_release' : 'article',
+            it.d.press ? '' : (a.q1 || ''), (it.d.press || a.q1 === 'yes') ? (a.q2 || '') : '',
+            '', '', '', '', '', '', '', '', a.note || ''].concat(tail)));
+        } else {
+          var y = a.q4 === 'yes';
+          rows.push(pre.concat([it.d.id, 'qs', '', '', '', '', '',
+            a.q4 || '', y ? (a.econ ? 1 : 0) : '', y ? (a.chances ? 1 : 0) : '', y ? (a.rights ? 1 : 0) : '',
+            y ? (a.q5 || '') : '', a.note || ''].concat(tail)));
+        }
+      });
+    });
+    return rows;
+  }
+
+  function csvText() {
+    return '\ufeff' + [COLS].concat(table()).map(function (r) {
+      return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\r\n');
+  }
+
+  function filename() {
+    var who = (S.coder || PLAT.pid || 'coder').replace(/[^\w-]+/g, '_');
+    return 'answers_' + who + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  }
+
+  // Tries the real file download and reports whether the browser accepted it. A
+  // sandboxed frame blocks this outright, so the caller always has a fallback.
+  function tryDownload() {
+    var csv = csvText(), name = filename();
+    try {
+      var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      var link = el('a', { href: url, download: name });
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      return true;
+    } catch (e) { /* fall through to the data: URI */ }
+    try {
+      var link2 = el('a', { href: 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv), download: name });
+      document.body.appendChild(link2); link2.click(); link2.remove();
+      return true;
+    } catch (e2) { return false; }
+  }
+
+  function download() {
+    // Where a download cannot be trusted, go straight to the copy-out screen rather
+    // than appearing to succeed.
+    if (FRAMED || !STORAGE_OK) { showAnswers(true); return; }
+    if (!tryDownload()) { showAnswers(true); return; }
+    showDownloaded();
+  }
+
+  function showDownloaded() {
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: 'Answers downloaded' }),
+      el('p', { text: 'Your browser was asked to save ' + filename() + ' \u2014 look in your Downloads ' +
+        'folder, then put the file in the shared Dropbox folder.' }),
+      el('p', { cls: 'how', text: 'No file appeared? Nothing is lost. Click \u201cShow answers as text\u201d ' +
+        'below and copy them out instead.' })]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Back to tasks', onclick: menu }),
+      el('button', { text: 'Show answers as text', onclick: function () { showAnswers(false); } }),
+      el('button', { cls: 'primary', text: 'Download again', onclick: download })]));
+  }
+
+  // Fallback for every browser that refuses a blob download (file:// pages, sandboxed
+  // previews, download-blocking settings): show the CSV and let it be copied out.
+  function showAnswers(becauseBlocked) {
+    var csv = csvText();
+    app.innerHTML = '';
+    var warn = banner(); if (warn) app.appendChild(warn);
+    var ta = el('textarea', { cls: 'dump', readonly: 'readonly', spellcheck: 'false' });
+    ta.value = csv;
+    var msg = el('span', { cls: 'msg' });
+    app.appendChild(el('div', { cls: 'card' }, [
+      el('h2', { text: becauseBlocked ? 'This window cannot save a file' : 'Answers as text' }),
+      el('p', { text: becauseBlocked
+        ? 'Your answers are complete and shown below \u2014 nothing is lost. This window cannot ' +
+          'write a file, so copy everything in the box and save it as answers.csv.'
+        : 'Copy everything in the box below and save it as a file called answers.csv.' }),
+      ta,
+      el('div', null, [
+        el('button', { cls: 'primary', text: 'Copy to clipboard', onclick: function () {
+          var ok = false;
+          try { ta.select(); ok = !!(document.execCommand && document.execCommand('copy')); }
+          catch (e) { ok = false; }
+          if (!ok && typeof navigator !== 'undefined' && navigator.clipboard) {
+            try { navigator.clipboard.writeText(csv); ok = true; } catch (e) { ok = false; }
+          }
+          msg.textContent = ok ? 'Copied. Save it as answers.csv'
+            : 'Copy did not work \u2014 click in the box, press Ctrl+A then Ctrl+C.';
+        } }),
+        msg])
+    ]));
+    app.appendChild(el('div', { cls: 'nav' }, [
+      el('button', { text: 'Back to tasks', onclick: menu }),
+      el('button', { text: 'Try the download again', onclick: download })]));
+  }
+
+  function submit(cb, phase) {
+    var payload = {
+      build: D.built, mode: D.mode, platform: PLAT.name,
+      participant_id: PLAT.pid, study_id: PLAT.study, platform_session_id: PLAT.session,
+      query: PLAT.query, coder: S.coder || '',
+      phase: phase || (CROWD ? 'completed' : 'completed'),
+      task: D.task || D.mode, language: D.language || '', batch: BATCH,
+      pilot: !!D.pilot, feedback: S.feedback || '',
+      entry: CROWD ? (S.entry || null) : null,
+      screeners: CROWD ? scoreScreeners() : null,
+      timings: CROWD ? { training_s: secs(S.t.training, S.t.training_end), entry_s: secs(S.t.entry, S.t.entry_end),
+                         production_s: secs(S.t.production, S.t.production_end) } : null,
+      started_at: S.started, finished_at: new Date().toISOString(),
+      columns: COLS, rows: table(), answers: S.ans
+    };
+    var done = false;
+    function once(ok, detail) { if (!done) { done = true; cb(ok, detail); } }
+    try {
+      var x = new XMLHttpRequest();
+      x.open('POST', CFG.submit_url, true);
+      // text/plain is a CORS 'simple request' (no preflight), which is what a Google Apps Script
+      // web app and most form endpoints accept; the body is still the JSON document.
+      x.setRequestHeader('Content-Type', CFG.submit_content_type || 'text/plain;charset=utf-8');
+      x.timeout = 20000;
+      x.onload = function () { once(x.status >= 200 && x.status < 300, 'status ' + x.status); };
+      x.onerror = function () { once(false, 'network error'); };
+      x.ontimeout = function () { once(false, 'timeout'); };
+      x.send(JSON.stringify(payload));
+    } catch (e) {
+      once(false, 'blocked');
+    }
+  }
+
+  var hguide = document.getElementById('hguide');   // static button in the header template (build_crowd_page.py)
+  if (CROWD && D.guide_html && hguide) { hguide.style.display = ''; hguide.addEventListener('click', guideOverlay); }
+  menu();
+})();
+</script>
+</body>
+</html>
